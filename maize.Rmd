@@ -1,0 +1,121 @@
+---
+title: "Maize outline"
+author: "Courtney Cooper"
+date: "5/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Maize Outline
+
+Outline for SA maize analysis
+
+
+
+### Get Data and Preprocess
+```{r data, include=FALSE}
+library(pacman)
+p_load(
+  dplyr,
+  tidyverse,
+  plyr
+)
+
+# Read data and stack
+
+rawdat <- list.files(path="data/", pattern="*csv", full.names = T)
+rawdat <- lapply(rawdat, read.csv)
+dat <- do.call("rbind", rawdat)
+dat$Region <- tolower(dat$Region)
+dat$locality <- tolower(dat$locality)
+dat$yield <- as.numeric(dat$yield)
+View(dat)
+
+write.csv(dat, "allyears.csv")
+rm(rawdat)
+summary(dat)
+```
+
+
+```{r data combining,include=false}
+cultivar <- read.csv("data/metadata/cultivarlist.csv")
+cultivar$variety_trim <- toupper(cultivar$variety_trim)
+dat$cultivar_name <- toupper(dat$cultivar_name)
+dat$cultivar_name <- trimws(dat$cultivar_name, which= c("both"))
+
+dat <- merge(dat,cultivar,by.x = "cultivar_name", by.y = "variety_trim", all.y = FALSE)
+names(dat)[names(dat) == "Year"] <- "year"
+names(dat)[names(dat) == "Provence"] <- "provence"
+names(dat)[names(dat) == "Region"] <- "region"
+names(dat)[names(dat) == "Rep"] <- "rep"
+names(dat)[names(dat) == "Year"] <- "year"
+
+write.csv(dat, "allyearsmerge.csv")
+```
+
+### Average and Summaries 
+
+```{r data summaries}
+dat <- dat[, !(names(dat) %in% c("technology","Yellow","White","variety","breeder.x"))]
+
+dat$color <- tolower(dat$color)
+names(dat)[names(dat) == "breeder.y"] <- "breeder"
+names(dat)[names(dat) == "Irrigated"] <- "irrigated"
+names(dat)[names(dat) == "X"] <- "technology"
+dat$technology <- gsub("0", "conv", dat$technology)
+#dat <- na.omit(dat,cols="yield", invert=FALSE)
+
+
+summary <- dat %>%
+  group_by(color, technology, year) %>%
+  summarize(Mean = mean(yield, na.rm=T),
+            SD = sd(yield, na.rm=T))
+                     
+view(summary)
+ 
+p <- ggplot(summary, aes(year, Mean))
+
+
+p + geom_violin(aes(color=technology), size = 1)
+```
+
+```{r data merging, include=false}
+olddat <- read.csv("data/metadata/allmaize1980_2010.csv")
+location <- read.csv("data/metadata/oldlocality.csv")
+location$locality <- tolower(location$locality)
+olddat$locality <- tolower(olddat$locality)
+
+#test <- olddat
+# <- join(olddat,location, by="locality", type= "left",match= "all")
+
+#view(test)
+#test$provence <- test$provence
+
+
+mergedat <- merge(olddat,location,by.x = "locality", by.y = "locality", all.x = TRUE, sort = FALSE)
+
+view(mergedat)
+mergedat$provence.x <- mergedat$provence.y
+
+colnames(mergedat)[4] <- "provence"
+
+
+mergedat <- mergedat[, !(names(mergedat) %in% c("provence.x","provence.y"))]
+
+
+
+```
+
+
+### Yield Increase in dryland BT maize
+
+### BT maize reduces yield risk
+
+### BT yield gains vary across dimensions
+
+### BT white maize has larger yield gains than GM yellow maize
+
+
