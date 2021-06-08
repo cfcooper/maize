@@ -1,1 +1,1 @@
-# maize-outline
+# maize
