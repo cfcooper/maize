@@ -18,11 +18,29 @@ Outline for SA maize analysis
 ### Get Data and Preprocess
 ```{r data, include=FALSE}
 library(pacman)
-p_load(
-  dplyr,
-  tidyverse,
-  plyr
-)
+library(plyr)
+library(dplyr)
+library(dbplyr)
+library(tidyverse)
+
+moveMe <- function(data, tomove, where = "last", ba = NULL) {
+  temp <- setdiff(names(data), tomove)
+  x <- switch(
+    where,
+    first = data[c(tomove, temp)],
+    last = data[c(temp, tomove)],
+    before = {
+      if (is.null(ba)) stop("must specify ba column")
+      if (length(ba) > 1) stop("ba must be a single character string")
+      data[append(temp, values = tomove, after = (match(ba, temp)-1))]
+    },
+    after = {
+      if (is.null(ba)) stop("must specify ba column")
+      if (length(ba) > 1) stop("ba must be a single character string")
+      data[append(temp, values = tomove, after = (match(ba, temp)))]
+    })
+  x
+}
 
 # Read data and stack
 
@@ -32,26 +50,31 @@ dat <- do.call("rbind", rawdat)
 dat$Region <- tolower(dat$Region)
 dat$locality <- tolower(dat$locality)
 dat$yield <- as.numeric(dat$yield)
-View(dat)
 
 write.csv(dat, "allyears.csv")
 rm(rawdat)
-summary(dat)
+
 ```
 
 
 ```{r data combining,include=false}
 cultivar <- read.csv("data/metadata/cultivarlist.csv")
 cultivar$variety_trim <- toupper(cultivar$variety_trim)
+cultivar <- cultivar[, !(names(cultivar) %in% c("variety","technology"))]
+names(cultivar)[names(cultivar) == "variety_trim"] <- "cultivar_name"
+names(cultivar)[names(cultivar) == "X"] <- "technology"
 dat$cultivar_name <- toupper(dat$cultivar_name)
 dat$cultivar_name <- trimws(dat$cultivar_name, which= c("both"))
 
-dat <- merge(dat,cultivar,by.x = "cultivar_name", by.y = "variety_trim", all.y = FALSE)
+dat <- merge(dat,cultivar,by = "cultivar_name")
 names(dat)[names(dat) == "Year"] <- "year"
 names(dat)[names(dat) == "Provence"] <- "provence"
 names(dat)[names(dat) == "Region"] <- "region"
 names(dat)[names(dat) == "Rep"] <- "rep"
 names(dat)[names(dat) == "Year"] <- "year"
+names(dat)[names(dat) == "breeder.x"] <- "breeder"
+dat <- dat[, !(names(dat) %in% c("Yellow","White","variety","breeder.y"))]
+
 
 write.csv(dat, "allyearsmerge.csv")
 ```
@@ -59,23 +82,17 @@ write.csv(dat, "allyearsmerge.csv")
 ### Average and Summaries 
 
 ```{r data summaries}
-dat <- dat[, !(names(dat) %in% c("technology","Yellow","White","variety","breeder.x"))]
 
 dat$color <- tolower(dat$color)
-names(dat)[names(dat) == "breeder.y"] <- "breeder"
 names(dat)[names(dat) == "Irrigated"] <- "irrigated"
-names(dat)[names(dat) == "X"] <- "technology"
 dat$technology <- gsub("0", "conv", dat$technology)
-#dat <- na.omit(dat,cols="yield", invert=FALSE)
 
+dat <- dat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "breeder", "rep", "yield", "color", "type", "technology", "crop", "temp", "irrigated", "number", "release_year")]
 
-summary <- dat %>%
-  group_by(color, technology, year) %>%
-  summarize(Mean = mean(yield, na.rm=T),
-            SD = sd(yield, na.rm=T))
-                     
-view(summary)
- 
+summary <- dat %>% group_by(dat$color, dat$technology, dat$year, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
 p <- ggplot(summary, aes(year, Mean))
 
 
@@ -88,26 +105,30 @@ location <- read.csv("data/metadata/oldlocality.csv")
 location$locality <- tolower(location$locality)
 olddat$locality <- tolower(olddat$locality)
 
-#test <- olddat
-# <- join(olddat,location, by="locality", type= "left",match= "all")
-
-#view(test)
-#test$provence <- test$provence
-
-
 mergedat <- merge(olddat,location,by.x = "locality", by.y = "locality", all.x = TRUE, sort = FALSE)
-
-view(mergedat)
 mergedat$provence.x <- mergedat$provence.y
-
 colnames(mergedat)[4] <- "provence"
-
-
 mergedat <- mergedat[, !(names(mergedat) %in% c("provence.x","provence.y"))]
+
+mergedat <- moveMe(mergedat, c("locality"), "after", "locality_no")
+olddat <- merge(mergedat,cultivar, all= TRUE)
+rm(mergedat)
+
+write.csv(olddat,"olddatacomplete.csv")
+
+mergeall <- bind_rows(olddat,dat)
+
+
+
+
+view(temp)
+summary(temp)
 
 
 
 ```
+
+
 
 
 ### Yield Increase in dryland BT maize
