@@ -89,14 +89,14 @@ dat$technology <- gsub("0", "conv", dat$technology)
 
 dat <- dat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "breeder", "rep", "yield", "color", "type", "technology", "crop", "temp", "irrigated", "number", "release_year")]
 
-summary <- dat %>% group_by(dat$color, dat$technology, dat$year, .add = FALSE) %>% 
+summary <- dat %>% group_by(color, technology, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(summary, aes(year, Mean))
+p <- ggplot(summary, aes(year, mean))
 
 
-p + geom_violin(aes(color=technology), size = 1)
+p + geom_smooth(aes(color=technology), size = 1)
 ```
 
 ```{r data merging, include=false}
@@ -119,10 +119,6 @@ write.csv(olddat,"olddatacomplete.csv")
 mergeall <- bind_rows(olddat,dat)
 
 
-
-
-view(temp)
-summary(temp)
 
 
 
