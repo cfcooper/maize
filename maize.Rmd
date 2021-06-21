@@ -94,9 +94,15 @@ summary <- dat %>% group_by(color, technology, year, .add = FALSE) %>%
             SD = sd(yield, na.rm = T))
 
 p <- ggplot(summary, aes(year, mean))
-
-
 p + geom_smooth(aes(color=technology), size = 1)
+
+
+write.csv(summary, "summary.csv")
+differences <- read.csv("data/metadata/differences.csv")
+
+p <- ggplot(differences, aes(year, differences))
+p + geom_smooth(aes(color=technology), size = 1)
+
 ```
 
 ```{r data merging, include=false}
@@ -115,6 +121,7 @@ olddat <- merge(mergedat,cultivar, all= TRUE)
 rm(mergedat)
 
 write.csv(olddat,"olddatacomplete.csv")
+
 
 mergeall <- bind_rows(olddat,dat)
 
