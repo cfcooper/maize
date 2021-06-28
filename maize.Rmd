@@ -25,24 +25,6 @@ library(tidyverse)
 library(stringr)
 library(stringi)
 
-moveMe <- function(data, tomove, where = "last", ba = NULL) {
-  temp <- setdiff(names(data), tomove)
-  x <- switch(
-    where,
-    first = data[c(tomove, temp)],
-    last = data[c(temp, tomove)],
-    before = {
-      if (is.null(ba)) stop("must specify ba column")
-      if (length(ba) > 1) stop("ba must be a single character string")
-      data[append(temp, values = tomove, after = (match(ba, temp)-1))]
-    },
-    after = {
-      if (is.null(ba)) stop("must specify ba column")
-      if (length(ba) > 1) stop("ba must be a single character string")
-      data[append(temp, values = tomove, after = (match(ba, temp)))]
-    })
-  x
-}
 
 # Read data and stack
 
@@ -89,7 +71,7 @@ dat$color <- tolower(dat$color)
 names(dat)[names(dat) == "Irrigated"] <- "irrigated"
 dat$technology <- gsub("0", "conv", dat$technology)
 
-dat <- dat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "breeder", "rep", "yield", "color", "type", "technology", "crop", "temp", "irrigated", "number", "release_year")]
+dat <- dat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "breeder", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year")]
 
 summary <- dat %>% group_by(color, technology, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
@@ -143,29 +125,60 @@ olddat$trait <- if_else(olddat$last2 == "BT", "B", olddat$trait)
 #need to add a catch for breeder letters
 
 #add season?
+#add GE/remove if before 1998
+#split locality?
 
-olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "breeder", "rep", "yield", "color", "type", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
-
-
-
+olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "trait", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
 
 mergedat <- merge(olddat,location,by.x = "locality", by.y = "locality", all.x = TRUE, sort = FALSE)
 mergedat$provence.x <- mergedat$provence.y
 colnames(mergedat)[4] <- "provence"
 mergedat <- mergedat[, !(names(mergedat) %in% c("provence.x","provence.y"))]
+mergedat$technology <- mergedat$trait
+mergedat$technology <- if_else(mergedat$technology == "A", "conv", mergedat$technology)
 
-mergedat <- moveMe(mergedat, c("locality"), "after", "locality_no")
-olddat <- merge(mergedat,cultivar, all= TRUE)
+olddat <- mergedat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+
+olddat <- subset(olddat, olddat$locality!="h"| olddat$locality!="ty")
+olddat <- subset(olddat, olddat$provence!=".")
+
+summaryloc <- olddat %>% group_by(year, locality) %>% summarise(count = n()) # check location if in more than one year
+summaryloc2 <- summaryloc %>% group_by(locality) %>% summarise (count = n())
+
+olddat <- merge(olddat,summaryloc2,by= "locality")
+olddat$nvals <- olddat$count
+olddat <- subset(olddat, olddat$nvals!="1") #drop if in less than 1 year
+
+summarycult <- olddat %>% group_by(year, locality,cultivar_name) %>% summarise(count = n()) # check cultivar if in more than one year/location
+summarycult2 <- summarycult %>% group_by(cultivar_name) %>% summarise (count = n())
+
+olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+
+rm(summaryloc)
+rm(summaryloc2)
+rm(summarycult)
+rm(summarycult2)
 rm(mergedat)
 
 write.csv(olddat,"olddatacomplete.csv")
 write.csv(cultivar,"cultivarbackup.csv") 
 
+```
+
+```{r data merging, include=false}
+
+
 mergeall <- bind_rows(olddat,dat)
+summaryold <- olddat %>% group_by(color, technology, year, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+summaryall <- mergeall %>% group_by(color, technology, year, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
 
-
-
+p <- ggplot(summaryall, aes(year, mean))
+p + geom_smooth(aes(color=technology), size = 1)
 
  
 ```
