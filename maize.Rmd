@@ -26,7 +26,7 @@ library(stringi)
 
 
 # Read data and stack
-
+rm(list=ls())
 rawdat <- list.files(path="data/", pattern="*csv", full.names = T)
 rawdat <- lapply(rawdat, read.csv)
 dat <- do.call("rbind", rawdat)
@@ -182,8 +182,15 @@ mergeall <- merge(mergeall,summaryloc2,by= "locality")
 names(mergeall)[names(mergeall) == 'count'] <- 'nval'
 mergeall <- subset(mergeall, mergeall$nval!="1") # remove if location only used once
 
+#mergeall$irrigated[is.na(mergeall$irrigated)] <- 0
+#mergeall$land_type[is.na(mergeall$land_type)] <- 0
+#mergeall$land_type <- sub("^$", 0, mergeall$land_type)
+
+#mergeall$land_type <- if_else(mergeall$land_type == "Irrigation", 1, 0)
+#mergeall$irrigated <- if_else(mergeall$land_type == 1, 1, mergeall$irrigated)
 
 mergeall <- mergeall[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+
 
 rm(summaryloc, summaryloc2, summarylocall, summarylocall2, summarylocall3, summarycult, summarycult2,mergedat)
 
@@ -256,11 +263,21 @@ summaryloccult <- summaryloccult %>% group_by(cultivar_name) %>% summarise (coun
 
 
 ### Yield Increase in dryland BT maize
+```{}
+reg1 <- glm(yield ~ locality + year + technology, data=mergeall)
+summary(reg1)
+
+```
 
 ### BT maize reduces yield risk
 
 ### BT yield gains vary across dimensions
 
 ### BT white maize has larger yield gains than GM yellow maize
+
+###
+
+
+
 
 
