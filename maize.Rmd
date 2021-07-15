@@ -88,6 +88,12 @@ write.csv(summarynew, "summary.csv")
 ```{r data merging, include=false}
 olddat <- read.csv("data/metadata/allmaize1980_2010.csv")
 location <- read.csv("data/metadata/oldlocality.csv")
+
+location$locality <- iconv(location$locality, from = 'UTF-8', to = 'ASCII//TRANSLIT')
+location$locality <- str_replace_all(location$locality, "[^[:alnum:]]", "")
+olddat$locality <- iconv(olddat$locality, from = 'UTF-8', to = 'ASCII//TRANSLIT')
+olddat$locality <- str_replace_all(olddat$locality, "[^[:alnum:]]", "")
+
 location$locality <- tolower(location$locality)
 olddat$locality <- tolower(olddat$locality)
 
@@ -205,7 +211,7 @@ summaryall <- mergeall %>% group_by(color, technology, year, .add = FALSE) %>%
 p <- ggplot(summaryall, aes(year, mean))
 p + geom_smooth(aes(color=technology), size = 1)
 
-
+write.csv(mergeall,"allyearsmerge.csv") 
 
 ```
 
@@ -217,6 +223,7 @@ p + geom_smooth(aes(color=technology), size = 1)
 summaryloc <- mergeall %>% group_by(year, locality) %>% summarise(count = n()) # check location if in more than one year
 summaryloc <- summaryloc %>% group_by(year) %>% summarise (count = n()) # show how many trials per year
 
+write.csv(summaryloc, "trialsbyyear.csv")
 
 # white mean by year
 pwhite <- mergeall %>% filter(color == "white") %>%
@@ -275,9 +282,22 @@ summary(reg1)
 
 ### BT white maize has larger yield gains than GM yellow maize
 
-###
+### Powerpoint Info
+```{}
+rmarkdown::pandoc_version()
+
+title: "The Economic and Environmental Impact of Bt Maize Adoption in South Africa"
+author: Courtney Cooper
+date: August 1, 2021
+output: powerpoint_presentation
+---
+
+# The Economic and Environmental Impact of Bt Maize Adoption in South Africa
+
+## Introduction
 
 
+```
 
 
 
