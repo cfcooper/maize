@@ -13,10 +13,11 @@ dat %>%
   group_by(year) %>%
   summarise(mean = mean(yield, na.rm=T))
 
-mergeall$GM <- 0
-mergeall$GM <- ifelse(mergeall$technology != "conv", 1, 0)
+dat$GM <- 0
+dat$GM <- ifelse(dat$technology != "conv", 1, 0)
+dat$dry <- ifelse(dat$land_type=="Dryland", 1, 0)
 
-pre <- mergeall[mergeall$year < 2010,]
+pre <- dat[dat$year < 2011,]
 
 reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 summary(reg1)
@@ -31,10 +32,33 @@ summary(reg3)
 # run for bt and bt stacked only
 # only bt
 
-mergeall$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * mergeall$year
+dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * mergeall$year
 
-mergeall$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * mergeall$year + reg2$coefficients["GM:yearsq"] * mergeall$yearsq
+dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * mergeall$year + reg2$coefficients["GM:yearsq"] * mergeall$yearsq
 
-ggplot(data=mergeall)+
+ggplot(data=dat)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
+
+# Mixed Effects Models
+
+dat <- dat[dat$provence != "nam",]
+
+dat %>% 
+  group_by(provence) %>%
+  summarise(n = n(),
+            na = sum(is.na(provence)))
+
+me_loc <- lmer(yield ~ factor(year) + GM + ( GM -1 | locality), data=dat)
+summary(me_loc)
+re_loc_gm <- ranef(me_loc)$locality
+
+gg <- ggplot()
+gg + geom_histogram(data=re_loc_gm, aes(GM))
+
+dat$trend <- dat$year - min(dat$year) + 1
+
+me_pr <- lmer(yield ~ factor(year) + color + provence + dry +
+                GM + trend*GM +( trend*GM -1-trend | provence), data=dat)
+ranef(me_pr)$provence
+re_pr_gm <- ranef(me_pr)$provence
