@@ -22,19 +22,26 @@ pre <- dat[dat$year < 2011,]
 reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 summary(reg1)
 
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=mergeall)
+reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=dat)
 summary(reg2)
 
-reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=mergeall)
+reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=dat)
 summary(reg3)
+
+# subset dat by provence and run new regs.
+FS <- dat[dat$provence == "FC",]
+
+fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=FS)
+summary(fs_reg)
+
 
 ## different specifications - quadratic, sin(year) and cosine(year)
 # run for bt and bt stacked only
 # only bt
 
-dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * mergeall$year
+dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
 
-dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * mergeall$year + reg2$coefficients["GM:yearsq"] * mergeall$yearsq
+dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
 ggplot(data=dat)+
   #geom_line(aes(year, y_effect))+
