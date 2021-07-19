@@ -68,7 +68,7 @@ p <- ggplot(summarynew, aes(year, mean)) +
   geom_smooth(aes(color=technology), size = 1)
 p
 
-write.csv(summarynew, "summarynew.csv")
+write.csv(summarynew, "ouput/summarynew.csv")
 ```
 
 ```{r data merging, include=false}
