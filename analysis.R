@@ -62,3 +62,29 @@ me_pr <- lmer(yield ~ factor(year) + color + provence + dry +
                 GM + trend*GM +( trend*GM -1-trend | provence), data=dat)
 ranef(me_pr)$provence
 re_pr_gm <- ranef(me_pr)$provence
+
+###########################################################################
+# Code from JB Tack to extract mixed effects models components
+estimates <- coef(lmer3)
+fipsest <- estimates$fips
+fipsest <- data.frame(fips=row.names(fipsest), fipsest)
+fipsest$REfips <- fipsest$X.Intercept.
+fipsest <- fipsest[,c("fips","REfips")]
+fipsest$fips <- as.numeric(as.character(fipsest$fips))
+
+fipsest <- data.table(fipsest)
+setkey(fipsest,fips)
+setkey(trend_est,fips)
+trend_est <- merge(trend_est,fipsest,x.all=TRUE)
+
+distfipsest <- estimates$distfips
+distfipsest <- data.frame(distfips=row.names(distfipsest), distfipsest)
+distfipsest <- distfipsest[,c("distfips","trend","spline")]
+distfipsest$distfips <- as.numeric(as.character(distfipsest$distfips))
+distfipsest <- data.table(distfipsest)
+setkey(distfipsest,distfips)
+setkey(trend_est,distfips)
+trend_est <- merge(trend_est,distfipsest,x.all=TRUE)
+trend_est <- as.data.frame(trend_est)
+trend_est$trend1 <- 100*trend_est$trend #convert to percent
+trend_est$trend2 <- 100*(trend_est$trend + trend_est$spline) #convert to perc
