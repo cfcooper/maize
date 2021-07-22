@@ -7,7 +7,7 @@ p_load(tidyverse,
        lme4,
        merTools)
 
-dat <- readRDS("mergeall.rds")
+dat <- readRDS("finalpanel.rds")
 
 dat %>%
   group_by(year) %>%
@@ -15,9 +15,13 @@ dat %>%
 
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
-dat$dry <- ifelse(dat$land_type=="Dryland", 1, 0)
+dat$dry <- ifelse(dat$land_type=="dryland", 1, 0)
+dat$bt <- ifelse(dat$technology %in% c("B", "BR"), 1, 0)
+
 
 pre <- dat[dat$year < 2011,]
+allb <- dat[dat$bt == 1,]
+bonly <- dat[dat$technology == "B",]
 
 reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 summary(reg1)
@@ -28,24 +32,103 @@ summary(reg2)
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=dat)
 summary(reg3)
 
-# subset dat by provence and run new regs.
-FS <- dat[dat$provence == "FC",]
+## subset dat by provence and run new regs.
+
+#1
+FS <- dat[dat$provence == "FS",]
 
 fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=FS)
 summary(fs_reg)
 
+FS$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year
+
+FS$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year + reg2$coefficients["GM:yearsq"] * FS$yearsq
+
+
+
+#2
+GP <- dat[dat$provence == "GP",]
+
+gp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=GP)
+summary(gp_reg)
+
+#3
+MP <- dat[dat$provence == "MP",]
+
+mp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=MP)
+summary(mp_reg)
+
+#4
+NW <- dat[dat$provence == "NW",]
+
+nw_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=NW)
+summary(nw_reg)
+
+#5
+KZN <- dat[dat$provence == "KZN",]
+
+kzn_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=KZN)
+summary(kzn_reg)
+
+#6
+EC <- dat[dat$provence == "EC",]
+
+ec_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=EC)
+summary(ec_reg)
+
+#7
+LP <- dat[dat$provence == "LP",]
+
+lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=LP)
+summary(lp_reg)
+
+#8
+NC <- dat[dat$provence == "NC",]
+
+nc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=NC)
+summary(nc_reg)
+        
+#9
+WC <- dat[dat$provence == "WC",]
+
+wc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=WC)
+summary(wc_reg)
+
+
+
 
 ## different specifications - quadratic, sin(year) and cosine(year)
 # run for bt and bt stacked only
+
+breg1 <- glm(yield ~ provence + factor(year) + GM + color, data=allb)
+summary(reg1)
+
+breg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=allb)
+summary(reg2)
+
+breg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=allb)
+summary(reg3)
+
+
+
 # only bt
 
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
 
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
+## peak graphs
 ggplot(data=dat)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
+
+ggplot(data=FS)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
+
+
+
+
 
 # Mixed Effects Models
 

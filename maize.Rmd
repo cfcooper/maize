@@ -174,15 +174,10 @@ dat <- merge(dat, summaryloc2, by= "locality")
 names(dat)[names(dat) == 'count'] <- 'loc_n'
 dat <- dat[dat$loc_n != "1",] # remove if location only used once
 
-#dat$irrigated[is.na(dat$irrigated)] <- 0
-#dat$land_type[is.na(dat$land_type)] <- 0
-#dat$land_type <- sub("^$", 0, dat$land_type)
-
-#dat$land_type <- if_else(dat$land_type == "Irrigation", 1, 0)
-#dat$irrigated <- if_else(dat$land_type == 1, 1, dat$irrigated)
-
+dat$land_type2 <- if_else(dat$land_type == "Irrigation" | dat$irrigated == 1, "irrigated", "dryland", "dryland")
+dat$land_type <- dat$land_type2
 dat$yearsq <- dat$year*dat$year
-dat <- dat[c("year", "yearsq", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+dat <- dat[c("year", "yearsq", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "number", "release_year", "land_type")]
 
 summaryold <- olddat %>% 
   group_by(color, technology, year, .add = FALSE) %>% 
