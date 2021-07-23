@@ -7,7 +7,7 @@ p_load(tidyverse,
        lme4,
        merTools)
 
-dat <- readRDS("finalpanel.rds")
+dat <- readRDS("data/finalpanel.rds")
 
 dat %>%
   group_by(year) %>%
