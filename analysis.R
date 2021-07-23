@@ -36,64 +36,76 @@ summary(reg3)
 
 #1
 FS <- dat[dat$provence == "FS",]
-
 fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=FS)
 summary(fs_reg)
 
 FS$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year
-
 FS$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year + reg2$coefficients["GM:yearsq"] * FS$yearsq
-
 
 
 #2
 GP <- dat[dat$provence == "GP",]
-
 gp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=GP)
 summary(gp_reg)
 
+GP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * GP$year
+GP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * GP$year + reg2$coefficients["GM:yearsq"] * GP$yearsq
+
 #3
 MP <- dat[dat$provence == "MP",]
-
 mp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=MP)
 summary(mp_reg)
 
+MP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * MP$year
+MP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * MP$year + reg2$coefficients["GM:yearsq"] * MP$yearsq
+
 #4
 NW <- dat[dat$provence == "NW",]
-
 nw_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=NW)
 summary(nw_reg)
 
+NW$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NW$year
+NW$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NW$year + reg2$coefficients["GM:yearsq"] * NW$yearsq
+
 #5
 KZN <- dat[dat$provence == "KZN",]
-
 kzn_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=KZN)
 summary(kzn_reg)
 
+KZN$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * KZN$year
+KZN$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * KZN$year + reg2$coefficients["GM:yearsq"] * KZN$yearsq
+
 #6
 EC <- dat[dat$provence == "EC",]
-
 ec_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=EC)
 summary(ec_reg)
 
+EC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * EC$year
+EC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * EC$year + reg2$coefficients["GM:yearsq"] * EC$yearsq
+
 #7
 LP <- dat[dat$provence == "LP",]
-
 lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=LP)
 summary(lp_reg)
 
+LP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * LP$year
+LP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * LP$year + reg2$coefficients["GM:yearsq"] * LP$yearsq
+
 #8
 NC <- dat[dat$provence == "NC",]
-
 nc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=NC)
 summary(nc_reg)
-        
+
+NC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NC$year
+NC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NC$year + reg2$coefficients["GM:yearsq"] * NC$yearsq
+      
 #9
 WC <- dat[dat$provence == "WC",]
-
 wc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=WC)
 summary(wc_reg)
 
+WC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year
+WC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year + reg2$coefficients["GM:yearsq"] * WC$yearsq
 
 
 
@@ -126,8 +138,37 @@ ggplot(data=FS)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
+ggplot(data=GP)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
 
+ggplot(data=MP)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
 
+ggplot(data=NW)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
+
+ggplot(data=KZN)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
+
+ggplot(data=EC)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
+
+ggplot(data=LP)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
+
+ggplot(data=NC)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
+
+ggplot(data=WC)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect))
 
 
 # Mixed Effects Models
