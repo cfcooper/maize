@@ -196,15 +196,15 @@ summaryall <- dat %>%
 p <- ggplot(summaryall, aes(year, mean))+ 
   geom_smooth(aes(color=technology), size = 1)
 p
-write.csv(olddat,"olddatacomplete.csv")
+write.csv(olddat,"data/olddatacomplete.csv")
 #write.csv(cultivar,"cultivarbackup.csv") 
-write.csv(dat, "allyearsmerge.csv")
-saveRDS(dat,"finalpanel.rds")
+write.csv(dat, "data/allyearsmerge.csv")
+saveRDS(dat,"data/finalpanel.rds")
 rm(list=ls())
 ```
 
 ```{r datasummary stats, include=false}
-dat <- readRDS("finalpanel.rds")
+dat <- readRDS("data/finalpanel.rds")
 
 #number of trials by year
 summaryloc <- dat %>% 

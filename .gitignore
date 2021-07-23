@@ -6,3 +6,6 @@
 *.csv
 *.rds
 
+data/
+output/
+test-figure/
