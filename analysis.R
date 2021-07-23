@@ -35,8 +35,8 @@ summary(reg3)
 ## subset dat by provence and run new regs.
 
 #1
-FS <- dat[dat$provence == "FS",]
-fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=FS)
+# FS <- dat[dat$provence == "FS",]
+fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=dat[dat$provence == "FS",])
 summary(fs_reg)
 
 FS$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year
@@ -170,6 +170,12 @@ ggplot(data=WC)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
+
+#################################################################################
+
+# Breakpoint Analysis
+
+#################################################################################
 
 # Mixed Effects Models
 

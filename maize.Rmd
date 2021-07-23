@@ -197,7 +197,6 @@ p <- ggplot(summaryall, aes(year, mean))+
   geom_smooth(aes(color=technology), size = 1)
 p
 write.csv(olddat,"data/olddatacomplete.csv")
-#write.csv(cultivar,"cultivarbackup.csv") 
 write.csv(dat, "data/allyearsmerge.csv")
 saveRDS(dat,"data/finalpanel.rds")
 rm(list=ls())
