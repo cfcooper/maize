@@ -29,6 +29,8 @@ summary(reg1)
 reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=dat)
 summary(reg2)
 
+# Provence by year by GM effects in one model
+## Need to add robust standard errors using jtools, sandwich, and lmtest packages
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=dat)
 summary(reg3)
 
@@ -107,6 +109,7 @@ summary(wc_reg)
 WC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year
 WC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year + reg2$coefficients["GM:yearsq"] * WC$yearsq
 
+prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
 
 
 ## different specifications - quadratic, sin(year) and cosine(year)
@@ -130,9 +133,9 @@ dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$yea
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
 ## peak graphs
-ggplot(data=dat)+
+ggplot(data=prov)+
   #geom_line(aes(year, y_effect))+
-  geom_line(aes(year, ysq_effect))
+  geom_line(aes(year, ysq_effect, color=provence))
 
 ggplot(data=FS)+
   #geom_line(aes(year, y_effect))+
@@ -173,7 +176,12 @@ ggplot(data=WC)+
 
 #################################################################################
 
-# Breakpoint Analysis
+# Breakpoint Analysis / Piecewise Linear Regression / Segmented Regression
+
+
+
+
+
 
 #################################################################################
 
