@@ -37,7 +37,7 @@ summary(reg3)
 ## subset dat by provence and run new regs.
 
 #1
-# FS <- dat[dat$provence == "FS",]
+FS <- dat[dat$provence == "FS",]
 fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=dat[dat$provence == "FS",])
 summary(fs_reg)
 
@@ -133,9 +133,14 @@ dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$yea
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
 ## peak graphs
-ggplot(data=prov)+
+ggplot(data=dat)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect, color=provence))
+
+## peak graphs
+ggplot(data=prov)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, y_effect, color=provence))
 
 ggplot(data=FS)+
   #geom_line(aes(year, y_effect))+
