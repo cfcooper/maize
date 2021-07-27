@@ -215,11 +215,11 @@ tbl_summary(mergedt1) %>% as_flex_table()
 
 # Breakpoint Analysis / Piecewise Linear Regression / Segmented Regression
 
-###breakreg2 <- segmented.glm(reg2, seg.Z =~year)
-###summary(breakreg2)
+breakreg2 <- segmented.glm(reg2, seg.Z =~year)
+summary(breakreg2)
 
-###breakfs <- segmented.glm(fs_reg, seg.Z =~ysq_effect, psi = )
-###summary(breakfs)
+breakfs <- segmented.glm(fs_reg, seg.Z =~ysq_effect)
+summary(breakfs)
 
 
 #################################################################################
