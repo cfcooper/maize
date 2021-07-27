@@ -38,9 +38,9 @@ Introduction 3
 
 In a study done by Shew et al 2021, yield gains were found in GM maize both white and yellow.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+- Yield increase is estimated at .42Mt ha from genetic modification
+- GM maize also reduced yield risk by 8%
+- GM yield gains vary under different conditions including different provinces and irrigated conditions, but GM yield gains are approximately twice as large for white relative to yellow maize
 
 Methods 1
 ========================================================
@@ -55,9 +55,7 @@ The data for the previous study was collected from 106 locations and 491 cultiva
 Methods 2
 ========================================================
 
-- *info on stata methods
-- 
-- 
+- info on stata methods
 
 Methods 3
 ========================================================
@@ -66,7 +64,7 @@ For our current study, we took the previous data that ranged from 1980-2008 and 
 
 - While the methods of collection were the same, this study is being conducted in R instead of Stata
 - Newer data was compiled and cleaned
-- regressions run included **
+- regressions run included a linear model and a quadratic model where yield was observed based on provence, year, technology, and color. 
 
 
 Original Results 1
@@ -74,17 +72,7 @@ Original Results 1
 
 
 ```r
-summary(cars)
-```
-
-```
-     speed           dist       
- Min.   : 4.0   Min.   :  2.00  
- 1st Qu.:12.0   1st Qu.: 26.00  
- Median :15.0   Median : 36.00  
- Mean   :15.4   Mean   : 42.98  
- 3rd Qu.:19.0   3rd Qu.: 56.00  
- Max.   :25.0   Max.   :120.00  
+## insert original graph? regressions
 ```
 
 Original Results 2
@@ -113,17 +101,21 @@ summary(cars)
 Updated Results 1
 ========================================================
 
-![plot of chunk unnamed-chunk-4](maizepresentation-figure/unnamed-chunk-4-1.png)
+
 
 Updated Results 2
 ========================================================
 
-![plot of chunk unnamed-chunk-5](maizepresentation-figure/unnamed-chunk-5-1.png)
+
 
 Updated Results 3
 ========================================================
 
-![plot of chunk unnamed-chunk-6](maizepresentation-figure/unnamed-chunk-6-1.png)
+
+
+Updated Results 4
+========================================================
+
 
 
 What's Next
@@ -136,20 +128,12 @@ What's Next
 Bibliography
 ========================================================
 
-For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
 
 Questions
 ========================================================
 
-For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
 
 
 

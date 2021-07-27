@@ -5,7 +5,14 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 p_load(tidyverse,
        lme4,
-       merTools)
+       merTools,
+       sandwich,
+       lmtest,
+       gtsummary)
+
+install.packages("lme4")
+install.packages("segmented")
+library(segmented)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -178,14 +185,41 @@ ggplot(data=WC)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
+###################################
+# robustness test
+
+
+coeftest(reg1, vcov = vcovHC(reg1, type="HC1"))
+coeftest(reg2, vcov = vcovHC(reg1, type="HC1"))
+
+######################################
+
+###########################################
+# Tables for presentation
+
+summ(reg1, scale = TRUE)
+
+
+t1 <- tbl_regression(reg1, exponentiate = TRUE)
+t2 <- tbl_regression(reg2, exponentiate = TRUE)
+
+mergedt1 <- tbl_merge(tbls = list(t1, t2), tab_spanner = c("**Linear**", "**Quadratic**"))
+tbl_summary(mergedt1) %>% as_flex_table()
+
+
+
+######################
+
 
 #################################################################################
 
 # Breakpoint Analysis / Piecewise Linear Regression / Segmented Regression
 
+###breakreg2 <- segmented.glm(reg2, seg.Z =~year)
+###summary(breakreg2)
 
-
-
+###breakfs <- segmented.glm(fs_reg, seg.Z =~ysq_effect, psi = )
+###summary(breakfs)
 
 
 #################################################################################

@@ -38,9 +38,9 @@ Introduction 3
 
 In a study done by Shew et al 2021, yield gains were found in GM maize both white and yellow.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+- Yield increase is estimated at .42Mt ha from genetic modification
+- GM maize also reduced yield risk by 8%
+- GM yield gains vary under different conditions including different provinces and irrigated conditions, but GM yield gains are approximately twice as large for white relative to yellow maize
 
 Methods 1
 ========================================================
@@ -55,9 +55,7 @@ The data for the previous study was collected from 106 locations and 491 cultiva
 Methods 2
 ========================================================
 
-- *info on stata methods
-- 
-- 
+- info on stata methods
 
 Methods 3
 ========================================================
@@ -66,14 +64,14 @@ For our current study, we took the previous data that ranged from 1980-2008 and 
 
 - While the methods of collection were the same, this study is being conducted in R instead of Stata
 - Newer data was compiled and cleaned
-- regressions run included **
+- regressions run included a linear model and a quadratic model where yield was observed based on provence, year, technology, and color. 
 
 
 Original Results 1
 ========================================================
 
 ```{r}
-summary(cars)
+## insert original graph? regressions
 ```
 
 Original Results 2
@@ -94,23 +92,29 @@ Updated Results 1
 ========================================================
 
 ```{r, echo=FALSE}
-plot(cars)
+# put combined table (linear and quadratic)
 ```
 
 Updated Results 2
 ========================================================
 
 ```{r, echo=FALSE}
-plot(cars)
+# put in curve graph
 ```
 
 Updated Results 3
 ========================================================
 
 ```{r, echo=FALSE}
-plot(cars)
+# combined table with third included
 ```
 
+Updated Results 4
+========================================================
+
+```{r, echo=FALSE}
+# both regressions? by provence?
+```
 
 What's Next
 ========================================================
@@ -122,20 +126,12 @@ What's Next
 Bibliography
 ========================================================
 
-For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
 
 Questions
 ========================================================
 
-For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
 
 
 
