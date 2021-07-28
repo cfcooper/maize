@@ -156,6 +156,16 @@ ggplot(post, aes(x=year, y=ysq_effect, group=provence, color=provence)) +
   geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
                 position=position_dodge(0.05))
 
+FS$sd <- sd(FS$ysq_effect, na.rm = TRUE)
+ggplot(FS, aes(x=year, y=ysq_effect)) + 
+  geom_line() +
+  geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
+                position=position_dodge(0.05))
+
+
+
+
+
 
 
 ## peak graphs
@@ -214,8 +224,8 @@ coeftest(reg2, vcov = vcovHC(reg1, type="HC1"))
 summ(reg1, scale = TRUE)
 
 
-t1 <- tbl_regression(reg1, exponentiate = TRUE)
-t2 <- tbl_regression(reg2, exponentiate = TRUE)
+t1 <- tbl_regression(reg1, exponentiate = TRUE, )
+t2 <- tbl_regression(reg2, exponentiate = TRUE, include = -c(year, yearsq))
 
 mergedt1 <- tbl_merge(tbls = list(t1, t2), tab_spanner = c("**Linear**", "**Quadratic**"))
 tbl_summary(mergedt1) %>% as_flex_table()
@@ -223,7 +233,20 @@ tbl_summary(mergedt1) %>% as_flex_table()
 
 
 ######################
+#graphs for presentation
 
+#box plot for yield by year, bt/non bt
+ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
+  geom_boxplot(aes(color=bt), size = 1)
+
+#box plot for yield by year, yellow/white
+ggplot(post, aes(year, yield, group= interaction(color, year))) + 
+  geom_boxplot(aes(color=color), size = 1)
+
+
+
+
+######################
 
 #################################################################################
 
