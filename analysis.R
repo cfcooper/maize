@@ -27,6 +27,7 @@ dat$bt <- ifelse(dat$technology %in% c("B", "BR"), 1, 0)
 
 
 pre <- dat[dat$year < 2011,]
+post <- dat[dat$year > "1999",]
 allb <- dat[dat$bt == 1,]
 bonly <- dat[dat$technology == "B",]
 
@@ -140,14 +141,27 @@ dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$yea
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
 ## peak graphs
-ggplot(data=dat)+
+
+#shortened graph (by year)
+ggplot(data=post)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect, color=provence))
+
+post$sd <- sd(post$ysq_effect, na.rm = TRUE)
+
+#shortened graph + error bars
+ggplot(post, aes(x=year, y=ysq_effect, group=provence, color=provence)) + 
+  geom_line() +
+  geom_point()+
+  geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
+                position=position_dodge(0.05))
+
+
 
 ## peak graphs
 ggplot(data=prov)+
   #geom_line(aes(year, y_effect))+
-  geom_line(aes(year, y_effect, color=provence))
+  geom_line(aes(year, ysq_effect, color=provence))
 
 ggplot(data=FS)+
   #geom_line(aes(year, y_effect))+

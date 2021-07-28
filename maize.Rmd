@@ -33,7 +33,7 @@ dat <- do.call("rbind", rawdat)
 dat$Region <- tolower(dat$Region)
 dat$locality <- tolower(dat$locality)
 
-dat <- dat[dat$yield != "*",]
+#dat <- dat[dat$yield != "*",]
 dat$yield <- as.numeric(dat$yield)
 cultivar <- read.csv("data/metadata/cultivarlist.csv")
 cultivar$variety_trim <- toupper(cultivar$variety_trim)
