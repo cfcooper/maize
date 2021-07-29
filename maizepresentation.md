@@ -4,6 +4,8 @@ author: Courtney Cooper
 date: 7/22/2021
 autosize: true
 
+
+
 Overview
 ========================================================
 
@@ -71,9 +73,6 @@ Original Results 1
 ========================================================
 
 
-```r
-## insert original graph? regressions
-```
 
 Original Results 2
 ========================================================
@@ -83,10 +82,6 @@ Original Results 2
 Original Results 3
 ========================================================
 
-
-```r
-summary(cars)
-```
 
 ```
      speed           dist       
@@ -117,5 +112,5 @@ Updated Results 3
 
 
 ```
-Error in eval(expr, envir, enclos) : object 'btgg2' not found
+Error in ggplot(btgg2) : object 'btgg2' not found
 ```

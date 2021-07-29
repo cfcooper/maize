@@ -4,6 +4,11 @@ author: Courtney Cooper
 date: 7/22/2021
 autosize: true
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
 Overview
 ========================================================
 
@@ -107,7 +112,7 @@ Updated Results 3
 
 ```{r, echo=FALSE}
 # combined table with third included
-btgg2
+ggplot(btgg2)
 colgg2
 
 ```
