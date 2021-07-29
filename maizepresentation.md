@@ -1,7 +1,10 @@
 THE ECONOMIC AND ENVIRONMENTAL IMPACT OF BT MAIZE ADOPTION IN SOUTH AFRICA
 ========================================================
 author: Courtney Cooper
+
 date: 7/22/2021
+
+
 autosize: true
 
 Overview
