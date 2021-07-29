@@ -9,7 +9,9 @@ p_load(tidyverse,
        sandwich,
        lmtest,
        gtsummary,
-       segmented)
+       segmented,
+       jtools,
+       Rcpp)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -21,7 +23,6 @@ dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 dat$dry <- ifelse(dat$land_type=="dryland", 1, 0)
 dat$bt <- ifelse(dat$technology %in% c("B", "BR"), 1, 0)
-
 
 pre <- dat[dat$year < 2011,]
 post <- dat[dat$year > "1999",]
@@ -184,7 +185,6 @@ ggplot(data=WC)+
 
 ###################################
 # robustness test
-
 
 coeftest(reg1, vcov = vcovHC(reg1, type="HC1"))
 coeftest(reg2, vcov = vcovHC(reg1, type="HC1"))
