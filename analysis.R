@@ -124,49 +124,25 @@ prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
 # run for bt and bt stacked only
 
 breg1 <- glm(yield ~ provence + factor(year) + GM + color, data=allb)
-summary(reg1)
+summary(breg1)
 
 breg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=allb)
-summary(reg2)
+summary(breg2)
 
 breg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=allb)
-summary(reg3)
+summary(breg3)
 
 
 
 # only bt
 
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
-
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
+post$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year
+post$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year + reg2$coefficients["GM:yearsq"] * post$yearsq
+
 ## peak graphs
-
-#shortened graph (by year)
-ggplot(data=post)+
-  #geom_line(aes(year, y_effect))+
-  geom_line(aes(year, ysq_effect, color=provence))
-
-post$sd <- sd(post$ysq_effect, na.rm = TRUE)
-
-#shortened graph + error bars
-ggplot(post, aes(x=year, y=ysq_effect, group=provence, color=provence)) + 
-  geom_line() +
-  geom_point()+
-  geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
-                position=position_dodge(0.05))
-
-FS$sd <- sd(FS$ysq_effect, na.rm = TRUE)
-ggplot(FS, aes(x=year, y=ysq_effect)) + 
-  geom_line() +
-  geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
-                position=position_dodge(0.05))
-
-
-
-
-
-
 
 ## peak graphs
 ggplot(data=prov)+
@@ -231,18 +207,71 @@ mergedt1 <- tbl_merge(tbls = list(t1, t2), tab_spanner = c("**Linear**", "**Quad
 tbl_summary(mergedt1) %>% as_flex_table()
 
 
+#########################################
+## ATTEMPTS AT SE GRAPHS ##
+
+sumdata <- ddply(post, c("year", "provence"), summarise,
+               N    = length(yield),
+               mean = mean(yield),
+               sd   = sd(yield),
+               se   = sd / sqrt(N))
+sumdata
+postSE <- merge(post, sumdata, by=c("year","provence"))
+
+ggplot(postSE, aes(x=year, y=ysq_effect, group=provence, color=provence)) + 
+  geom_line() +
+  geom_point()+
+  geom_errorbar(aes(ymin=ysq_effect-se, ymax=ysq_effect+se), width=.2,
+                position=position_dodge(0.05))
+
+
+#shortened graph (by year)
+ggplot(data=post)+
+  #geom_line(aes(year, y_effect))+
+  geom_line(aes(year, ysq_effect, color=provence))
+
+post$sd <- sd(post$ysq_effect, na.rm = TRUE)
+
+#shortened graph + error bars
+
+FS$sd <- sd(FS$ysq_effect, na.rm = TRUE)
+ggplot(FS, aes(x=year, y=ysq_effect)) + 
+  geom_line() +
+  geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
+                position=position_dodge(0.05))
 
 ######################
 #graphs for presentation
 
 #box plot for yield by year, bt/non bt
-ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
+post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
+btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
   geom_boxplot(aes(color=bt), size = 1)
 
-#box plot for yield by year, yellow/white
-ggplot(post, aes(year, yield, group= interaction(color, year))) + 
-  geom_boxplot(aes(color=color), size = 1)
+btgg2 <- btgg +
+  theme_bw() +
+  labs(
+    x = "Year",
+    y = "Yield",
+    colour = "Technology Type",
+    title = "Yield Differences Between Bt and Conventional Over Time"
+  ) +
+  scale_colour_brewer(type = "seq", palette = "Set2")
+btgg2
 
+#box plot for yield by year, yellow/white
+colgg <- ggplot(post, aes(year, yield, group= interaction(color, year))) + 
+  geom_boxplot(aes(color=color), size = 1)
+colgg2 <- colgg +
+  theme_bw() +
+  labs(
+    x = "Year",
+    y = "Yield",
+    colour = "Color",
+    title = "Yield Differences Between Yellow and White Over Time"
+  ) +
+  scale_colour_brewer(type = "seq", palette = "Set2")
+colgg2
 
 
 
