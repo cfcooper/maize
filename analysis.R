@@ -8,11 +8,8 @@ p_load(tidyverse,
        merTools,
        sandwich,
        lmtest,
-       gtsummary)
-
-install.packages("lme4")
-install.packages("segmented")
-library(segmented)
+       gtsummary,
+       segmented)
 
 dat <- readRDS("data/finalpanel.rds")
 
