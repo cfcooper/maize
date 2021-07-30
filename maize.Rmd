@@ -23,6 +23,7 @@ library(dplyr)
 library(tidyverse)
 library(stringr)
 library(stringi)
+library(kableExtra)
 
 
 # Read data and stack

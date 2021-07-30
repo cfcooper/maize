@@ -12,6 +12,7 @@ p_load(tidyverse,
        segmented,
        jtools,
        Rcpp)
+install.packages(kableExtra)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -31,6 +32,8 @@ bonly <- dat[dat$technology == "B",]
 
 reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 summary(reg1)
+summ(reg1)
+
 
 reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=dat)
 summary(reg2)
@@ -194,7 +197,7 @@ coeftest(reg2, vcov = vcovHC(reg1, type="HC1"))
 ###########################################
 # Tables for presentation
 
-summ(reg1, scale = TRUE)
+reg1t <- summary(reg1, scale = TRUE)
 
 
 t1 <- tbl_regression(reg1, exponentiate = TRUE, )
@@ -227,7 +230,6 @@ ggplot(data=post)+
   #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect, color=provence))
 
-post$sd <- sd(post$ysq_effect, na.rm = TRUE)
 
 #shortened graph + error bars
 

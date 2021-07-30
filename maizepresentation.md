@@ -34,7 +34,7 @@ Introduction 2
 
 Most research evaluating the impacts of GM crops focuses on the producer benefits of GM input traits or the influence of consumer valuation and acceptance in GM crop adoption
 
-- Specifically, the producers that have benefited the most are low income farmers in developing countries where there are fewer options for pest managemnet and crop vulnerability tends to be higher 
+- Specifically, the producers that have benefited the most are low income farmers in developing countries where there are fewer options for pest management and crop vulnerability tends to be higher 
 - Other findings conclude GM input traits have second-order socioeconomic impacts such as labor-savings and environmental benefits
 - Many skeptics suggest that there is not clear evidence that GM maize has yield gains in South Africa that benefit producers
 
@@ -74,7 +74,9 @@ For our current study, we took the previous data that ranged from 1980-2008 and 
 
 Original Results 1
 ========================================================
+```{render = 'normal_print'}
 
+````
 
 
 Original Results 2
@@ -86,19 +88,9 @@ Original Results 3
 ========================================================
 
 
-```
-     speed           dist       
- Min.   : 4.0   Min.   :  2.00  
- 1st Qu.:12.0   1st Qu.: 26.00  
- Median :15.0   Median : 36.00  
- Mean   :15.4   Mean   : 42.98  
- 3rd Qu.:19.0   3rd Qu.: 56.00  
- Max.   :25.0   Max.   :120.00  
-```
-
 Updated Results 1
 ========================================================
-
+ggplot(btgg2)
 
 
 Updated Results 2
