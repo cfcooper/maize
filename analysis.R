@@ -30,9 +30,14 @@ post <- dat[dat$year > "1999",]
 allb <- dat[dat$bt == 1,]
 bonly <- dat[dat$technology == "B",]
 
-reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
-summary(reg1)
-summ(reg1)
+pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
+sum_prereg <- summary(pre_reg)
+sum_prereg
+
+reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=dat)
+sum_reg1 <- summary(reg1)
+sum_reg1
+#summ(reg1)
 
 
 reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=dat)

@@ -18,7 +18,6 @@ Outline for SA maize analysis
 ### Get Data and Preprocess
 ```{r data, include=FALSE}
 library(pacman)
-library(plyr)
 library(dplyr)
 library(tidyverse)
 library(stringr)
