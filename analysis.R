@@ -11,8 +11,8 @@ p_load(tidyverse,
        gtsummary,
        segmented,
        jtools,
-       Rcpp)
-install.packages(kableExtra)
+       Rcpp,
+       kableExtra)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -30,13 +30,21 @@ post <- dat[dat$year > "1999",]
 allb <- dat[dat$bt == 1,]
 bonly <- dat[dat$technology == "B",]
 
+summarynew <- dat %>% group_by(color, technology, year, .add = FALSE) %>% 
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(summarynew, aes(year, mean))
+p + geom_smooth(aes(color=technology), size = 1)
+
+
 pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 sum_prereg <- summary(pre_reg)
 sum_prereg
 
 reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=dat)
-sum_reg1 <- summary(reg1)
-sum_reg1
+summary(reg1)
+
 #summ(reg1)
 
 
@@ -242,7 +250,7 @@ FS$sd <- sd(FS$ysq_effect, na.rm = TRUE)
 ggplot(FS, aes(x=year, y=ysq_effect)) + 
   geom_line() +
   geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
-                position=position_dodge(0.05))
+                position=position_dodge(0.05)) 
 
 ######################
 #graphs for presentation
