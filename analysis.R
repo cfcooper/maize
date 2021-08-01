@@ -30,12 +30,13 @@ post <- dat[dat$year > "1999",]
 allb <- dat[dat$bt == 1,]
 bonly <- dat[dat$technology == "B",]
 
-summarynew <- dat %>% group_by(color, technology, year, .add = FALSE) %>% 
+summarynew <- dat %>% group_by(provence,color, technology, year, .add = FALSE) %>% 
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
 p <- ggplot(summarynew, aes(year, mean))
-p + geom_smooth(aes(color=technology), size = 1)
+p + geom_smooth(aes(color=color), size = 1) +
+  facet_wrap(~provence)
 
 
 pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
@@ -223,7 +224,7 @@ tbl_summary(mergedt1) %>% as_flex_table()
 #########################################
 ## ATTEMPTS AT SE GRAPHS ##
 
-sumdata <- ddply(post, c("year", "provence"), summarise,
+sumdata <- plyr::ddply(post, c("year", "provence"), summarise,
                N    = length(yield),
                mean = mean(yield),
                sd   = sd(yield),
@@ -235,7 +236,10 @@ ggplot(postSE, aes(x=year, y=ysq_effect, group=provence, color=provence)) +
   geom_line() +
   geom_point()+
   geom_errorbar(aes(ymin=ysq_effect-se, ymax=ysq_effect+se), width=.2,
-                position=position_dodge(0.05))
+                position=position_dodge(0.05)) +
+  facet_wrap(~provence)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 
 
 #shortened graph (by year)
