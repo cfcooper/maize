@@ -101,7 +101,7 @@ olddat$last1 <- str_sub(olddat$cultivar_name,-1,-1)
 olddat$last2 <-str_sub(olddat$cultivar_name,-2,-1)
 
 olddat$cultivar_br <- str_sub(olddat$cultivar_name,1,3) #make breeder letters
-olddat$cultivar_br1 <- extract_numeric(olddat$cultivar_br)
+olddat$cultivar_br1 <- tidyr::extract_numeric(olddat$cultivar_br)
 olddat$breeder <- ifelse(olddat$cultivar_br1 %in% c(NA), "ARC", "SA") #add breeder (private vs public?)
 
 olddat$trait <- "A"
@@ -112,18 +112,19 @@ olddat$trait <- if_else(olddat$last2 == "BT", "B", olddat$trait)
 
 olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "trait", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
-mergedat <- merge(olddat, location,
+olddat <- merge(olddat, location,
                   by.x = "locality", by.y = "locality", 
                   all.x = TRUE, sort = FALSE)
-mergedat$provence.x <- mergedat$provence.y
-colnames(mergedat)[4] <- "provence"
-mergedat <- mergedat[, !(names(mergedat) %in%
-                           c("provence.x","provence.y"))]
-mergedat$technology <- mergedat$trait
-mergedat$technology <- if_else(mergedat$technology == "A", 
-                               "conv", mergedat$technology)
 
-olddat <- mergedat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+olddat$provence.x <- olddat$provence.y
+colnames(olddat)[4] <- "provence"
+olddat <- olddat[, !(names(olddat) %in%
+                           c("provence.x","provence.y"))]
+olddat$technology <- olddat$trait
+olddat$technology <- if_else(olddat$technology == "A", 
+                               "conv", olddat$technology)
+
+olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
 ### Check why RR goes back to 1981
 ##########################################################################
@@ -141,55 +142,60 @@ olddat$Bt <- ifelse(olddat$technology == "B" |
                       olddat$technology == "BR", "Bt", "Conv")
 
 write.csv(olddat,"data/olddatacomplete.csv")
-write.csv(cultivar,"data/cultivarbackup.csv") 
 
-mergeall <- bind_rows(olddat,dat)
+dat <- bind_rows(olddat,dat)
 
-mergeall$locality <- if_else(mergeall$locality %in% 
+dat$locality <- if_else(dat$locality %in% 
                                c("bethelhem", "bethelehem"), 
-                             "bethlehem", mergeall$locality) #fix locality names in merged df
-mergeall$locality <- if_else(mergeall$locality %in% 
+                             "bethlehem", dat$locality) #fix locality names in merged df
+dat$locality <- if_else(dat$locality %in% 
                                c("bloemkomspruit"), 
-                             "bloekomspruit", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% 
+                             "bloekomspruit", dat$locality)
+dat$locality <- if_else(dat$locality %in% 
                                c(" coligny"), 
-                             "coligny", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% 
-                               c(" wesselsbron"), "wesselsbron", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% 
-                               c("foiuriesburg"), "fouriesburg", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% 
+                             "coligny", dat$locality)
+dat$locality <- if_else(dat$locality %in% 
+                               c(" wesselsbron"), "wesselsbron", dat$locality)
+dat$locality <- if_else(dat$locality %in% 
+                               c("foiuriesburg"), "fouriesburg", dat$locality)
+dat$locality <- if_else(dat$locality %in% 
                                c("grooptpan"), 
-                             "grootpan", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% 
-                               c("kapsteeel"), "kapsteel", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("losdoorn"), "losdoorns", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("middleburg"), "middelburg", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("losdoorn"), "losdoorns", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("wintertonlate", "winterton early"), "winterton", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("vilijoenskoon"), "viljoenskroon", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("swartruggen"), "swartruggens", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("delmas ", "delmas/rayton"), "delmas", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("lukehof"), "luckhoff", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("mooi river", "mooriver"), "mooirivier", mergeall$locality)
-mergeall$locality <- if_else(mergeall$locality %in% c("pocthfestroom", "potchfestroom"), "potchefstroom", mergeall$locality)
+                             "grootpan", dat$locality)
+dat$locality <- if_else(dat$locality %in% 
+                               c("kapsteeel"), "kapsteel", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("losdoorn"), "losdoorns", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("middleburg"), "middelburg", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("losdoorn"), "losdoorns", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("wintertonlate", "winterton early"), "winterton", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("vilijoenskoon"), "viljoenskroon", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("swartruggen"), "swartruggens", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("delmas ", "delmas/rayton"), "delmas", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("lukehof"), "luckhoff", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("mooi river", "mooriver"), "mooirivier", dat$locality)
+dat$locality <- if_else(dat$locality %in% c("pocthfestroom", "potchfestroom"), "potchefstroom", dat$locality)
 
-summarycult <- mergeall %>% group_by(year, cultivar_name) %>%
-  summarise(count = n()) # check cultivar if in more than one year/location
+summarycult <- dat %>% group_by(year, cultivar_name) %>%
+                summarise(count = n()) # check cultivar if in more than one year/location
 summarycult <- summarycult %>% group_by(cultivar_name) %>% 
-  summarise (count = n())
-mergeall <- merge(mergeall,summarycult, by="cultivar_name")
-names(mergeall)[names(mergeall) == 'count'] <- 'cult_nvals'
-mergeall <- mergeall[mergeall$cult_nvals!="1",]
+                summarise (count = n())
 
-summaryloc <- mergeall %>% group_by(year, locality) %>% 
+summarygm <- dat %>% group_by(year, technology) %>% summarise(count = n()) ##
+
+dat <- merge(dat,summarycult, by="cultivar_name")
+names(dat)[names(dat) == 'count'] <- 'cult_nvals'
+## dat <- dat[dat$cult_nvals!="1",]
+
+summarygm2 <- dat %>% group_by(year, technology) %>% summarise(count = n()) ##
+
+##################
+summaryloc <- dat %>% group_by(year, locality) %>% 
   summarise(count = n()) # check location if in more than one year
-summaryloc2 <- summaryloc %>% group_by(locality) %>% 
+summaryloc <- summaryloc %>% group_by(locality) %>% 
   summarise (count = n()) # trials per location
 
-mergeall <- merge(mergeall,summaryloc2,by= "locality")
-names(mergeall)[names(mergeall) == 'count'] <- 'nval'
-mergeall <- subset(mergeall, mergeall$nval!="1") # remove if location only used once
+dat <- merge(dat,summaryloc,by= "locality")
+names(dat)[names(dat) == 'count'] <- 'nval'
+dat <- subset(dat, dat$nval!="1") # remove if location only used once
 
 #mergeall$irrigated[is.na(mergeall$irrigated)] <- 0
 #mergeall$land_type[is.na(mergeall$land_type)] <- 0
@@ -198,27 +204,27 @@ mergeall <- subset(mergeall, mergeall$nval!="1") # remove if location only used 
 #mergeall$land_type <- if_else(mergeall$land_type == "Irrigation", 1, 0)
 #mergeall$irrigated <- if_else(mergeall$land_type == 1, 1, mergeall$irrigated)
 
-mergeall <- mergeall[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
 
-rm(summaryloc, summaryloc2, summarylocall, summarylocall2, summarylocall3, summarycult, summarycult2,mergedat)
+rm(summaryloc, summarycult,mergedat)
 
-mergeall$Bt <- ifelse(mergeall$technology == "B" | 
-                      mergeall$technology == "BR", "Bt", "Conv")
+dat$Bt <- ifelse(dat$technology == "B" | 
+                      dat$technology == "BR", "Bt", "Conv")
 
-summaryold <- olddat %>% 
+summaryold <- dat %>% 
   group_by(color, technology, Bt, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
-summaryall <- mergeall %>% 
+summaryall <- dat %>% 
   group_by(color, technology, Bt, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(summaryall, aes(year, mean))
-p + geom_smooth(aes(color=Bt), size = 1, method="lm")
+p <- ggplot(dat, aes(year, mean))
+## p + geom_smooth(aes(color=dat$Bt), size = 1, method="lm")
 
-write.csv(mergeall,"data/allyearsmerge.csv") 
+write.csv(dat,"data/allyearsmerge.csv") 
 
 ```
 
@@ -227,13 +233,13 @@ write.csv(mergeall,"data/allyearsmerge.csv")
 
 #number of trials by year
 
-summaryloc <- mergeall %>% group_by(year, locality) %>% summarise(count = n()) # check location if in more than one year
+summaryloc <- dat %>% group_by(year, locality) %>% summarise(count = n()) # check location if in more than one year
 summaryloc <- summaryloc %>% group_by(year) %>% summarise (count = n()) # show how many trials per year
 
 write.csv(summaryloc, "trialsbyyear.csv")
 
 # white mean by year
-pwhite <- mergeall %>% filter(color == "white") %>%
+pwhite <- dat %>% filter(color == "white") %>%
             group_by(color,technology, year, .add = FALSE) %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
@@ -247,7 +253,7 @@ p + geom_smooth(aes(color=technology), size = 1)
 ##            SD = sd(yield, na.rm = T))
 
 # Bt mean by year
-pbt <- mergeall %>% filter(technology == "B") %>%
+pbt <- dat %>% filter(technology == "B") %>%
             group_by(color, year, .add = FALSE) %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
@@ -256,7 +262,7 @@ p <- ggplot(pbt, aes(year, mean))
 p + geom_smooth(aes(color=color), size = 1)
 
 # RR mean by year
-prr <- mergeall %>% filter(technology == "R") %>%
+prr <- dat %>% filter(technology == "R") %>%
             group_by(color, year, .add = FALSE) %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
@@ -265,12 +271,12 @@ p <- ggplot(prr, aes(year, mean))
 p + geom_smooth(aes(color=color), size = 1)
 
 # number of cultivars by year
-summarycult <- mergeall %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
+summarycult <- dat %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
 summarycult <- summarycult %>% group_by(year) %>% summarise (count = n())
 
 
 # number of trials by cultivar
-summaryloccult <- mergeall %>% group_by(cultivar_name,year, locality) %>% summarise(count = n()) 
+summaryloccult <- dat %>% group_by(cultivar_name,year, locality) %>% summarise(count = n()) 
 summaryloccult <- summaryloccult %>% group_by(cultivar_name) %>% summarise (count = n())
 
 ```
@@ -278,7 +284,7 @@ summaryloccult <- summaryloccult %>% group_by(cultivar_name) %>% summarise (coun
 
 ### Yield Increase in dryland BT maize
 ```{}
-reg1 <- glm(yield ~ locality + year + technology, data=mergeall)
+reg1 <- glm(yield ~ locality + year + technology, data=dat)
 summary(reg1)
 
 ```
@@ -288,23 +294,6 @@ summary(reg1)
 ### BT yield gains vary across dimensions
 
 ### BT white maize has larger yield gains than GM yellow maize
-
-### Powerpoint Info
-```{}
-rmarkdown::pandoc_version()
-
-title: "The Economic and Environmental Impact of Bt Maize Adoption in South Africa"
-author: Courtney Cooper
-date: August 1, 2021
-output: powerpoint_presentation
----
-
-# The Economic and Environmental Impact of Bt Maize Adoption in South Africa
-
-## Introduction
-
-
-```
 
 
 
