@@ -227,14 +227,13 @@ dat <- merge(dat,summaryloc,by= "locality")
 names(dat)[names(dat) == 'count'] <- 'nval'
 dat <- subset(dat, dat$nval!="1") # remove if location only used once
 
-#mergeall$irrigated[is.na(mergeall$irrigated)] <- 0
-#mergeall$land_type[is.na(mergeall$land_type)] <- 0
-#mergeall$land_type <- sub("^$", 0, mergeall$land_type)
 
-#mergeall$land_type <- if_else(mergeall$land_type == "Irrigation", 1, 0)
-#mergeall$irrigated <- if_else(mergeall$land_type == 1, 1, mergeall$irrigated)
+dat$irrigated[is.na(dat$irrigated)] <- 0
+dat$land_type[is.na(dat$land_type)] <- ""
+dat$land_type[dat$land_type == "Irrigation"] <- "Irrigated"
+dat$irrigated <- if_else(dat$land_type == "Irrigated", 1, dat$irrigated)
 
-dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
+dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year")]
 
 
 rm(list=setdiff(ls(), "dat"))
@@ -254,7 +253,7 @@ summaryall <- dat %>%
 p <- ggplot(dat, aes(year, mean))
 ## p + geom_smooth(aes(color=dat$Bt), size = 1, method="lm")
 
-write.csv(dat,"data/allyearsmerge.csv") 
+write.csv(dat,"data/allyearsmerge.csv")
 
 ```
 
@@ -288,10 +287,10 @@ pwhite <- dat %>% filter(color == "white") %>%
 p <- ggplot(pwhite, aes(year, mean))
 p + geom_smooth(aes(color=technology), size = 1)
 
-## pdry <- mergeall %>% filter(color == "white") %>%
-##            group_by(color,technology, year, .add = FALSE) %>%
-##           summarise(mean = mean(yield, na.rm = T), 
-##            SD = sd(yield, na.rm = T))
+pdry <- dat %>% filter(irrigated == 0) %>%
+           group_by(color,technology, year, .add = FALSE) %>%
+           summarise(mean = mean(yield, na.rm = T), 
+           SD = sd(yield, na.rm = T))
 
 # Bt mean by year
 pbt <- dat %>% filter(technology == "B") %>%
