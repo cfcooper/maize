@@ -3,9 +3,7 @@ rm(list=ls()) # Caution: this clears the Environment
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-p_load(tidyverse,
-       lme4,
-       merTools,
+p_load(merTools,
        sandwich,
        lmtest,
        gtsummary,
@@ -22,7 +20,6 @@ dat %>%
 
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
-dat$dry <- ifelse(dat$land_type=="dryland", 1, 0)
 dat$bt <- ifelse(dat$technology %in% c("B", "BR"), 1, 0)
 
 pre <- dat[dat$year < 2011,]
@@ -43,14 +40,21 @@ pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 sum_prereg <- summary(pre_reg)
 sum_prereg
 
-reg1 <- glm(yield ~ provence + factor(year) + GM + color, data=dat)
+reg1 <- glm(yield ~ provence + factor(year) + GM + color + irrigated, data=dat)
 summary(reg1)
 
 #summ(reg1)
 
+dat$yearsq <- dat$year*dat$year
 
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=dat)
+reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
 summary(reg2)
+
+dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
+dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
+
+post$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year
+post$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year + reg2$coefficients["GM:yearsq"] * post$yearsq
 
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
@@ -151,11 +155,7 @@ summary(breg3)
 
 # only bt
 
-dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
-dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
-post$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year
-post$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year + reg2$coefficients["GM:yearsq"] * post$yearsq
 
 ## peak graphs
 

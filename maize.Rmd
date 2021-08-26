@@ -15,8 +15,7 @@ rm(list=ls()) # Caution: this clears the Environment
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-p_load(dplyr, ggplot2, stringr, stringi)
-
+p_load(dplyr, ggplot2, stringr, stringi,readr)
 
 # Read data and stack
 rawdat <- list.files(path="data/rawdat", pattern="*csv", full.names = T)
@@ -129,20 +128,15 @@ olddat$technology <- if_else(olddat$technology == "A",
 olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
 summarygm <- olddat %>% group_by(year, technology) %>% summarise(count = n()) ### Check why RR goes back to 1981
-##########################################################################
 
 oldr <- olddat[olddat$technology == "R",]
 oldbr <- olddat[olddat$technology == "BR",]
 oldb <- olddat[olddat$technology == "B",]
 oldgm <- bind_rows(oldr,oldbr,oldb)
 oldgm <- oldgm[!(oldgm$year >= 1998),]
-###################
 
 olddat <- olddat[!(olddat$technology %in% 
                      c("R","BR","B") & olddat$year <= 1998),] #remove if before 1998 and GE
-
-olddat <- olddat[olddat$locality!="h"|olddat$locality!="ty",]
-olddat <- olddat[olddat$provence!=".",]
 
 olddat <- olddat[c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
@@ -194,6 +188,37 @@ dat$locality <- if_else(dat$locality %in% c("lukehof"), "luckhoff", dat$locality
 dat$locality <- if_else(dat$locality %in% c("mooi river", "mooriver"), "mooirivier", dat$locality)
 dat$locality <- if_else(dat$locality %in% c("pocthfestroom", "potchfestroom"), "potchefstroom", dat$locality)
 dat$locality <- if_else(dat$locality %in% c("weeselsbron"), "wesselsbron", dat$locality)
+dat <- dat[dat$locality!="h"|dat$locality!="ty",]
+dat$provence <- trimws(dat$provence, which= c("both"))
+dat <- dat[dat$provence!=".",]
+dat$provence <- if_else(dat$locality %in% c("windfield"), "FS", dat$provence)
+dat$provence <- if_else(dat$locality %in% c("kapsteel"), "NW", dat$provence)
+dat$provence <- if_else(dat$locality %in% c("middelburg"), "MP", dat$provence)
+dat$provence <- if_else(dat$locality %in% c("greytown"), "KZN", dat$provence)
+dat$provence <- as.character(dat$provence)
+dat$provence <- as.factor(dat$provence)
+dat <- dat[!(dat$provence == "---" | is.na(dat$provence)), ]
+
+release <- subset(cultivar, select = c(cultivar_name, release_year))
+release$cultivar_name <- trimws(release$cultivar_name, which= c("both"))
+dat <- merge(dat,release, by="cultivar_name",all = TRUE)
+dat <- dat[!(dat$yield == "" | is.na(dat$yield)), ]
+
+names(dat)[names(dat) == "release_year.y"] <- "release_year"
+
+dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year")]
+
+
+
+summarycult <- dat %>% group_by(cultivar_name, year, release_year) %>% summarise(count = n())
+
+norelease <- dat[dat$release_year == "",]
+
+summaryrelease <- norelease %>% group_by(release_year, cultivar_name) %>% 
+  summarise(count = n())
+### Left off here - identify cultivars with no release date
+
+####
 
 dat$cultivar_release <- str_sub(dat$release_year,1,4)
 
@@ -203,19 +228,10 @@ summarycult <- dat %>% group_by(year, cultivar_name) %>%
 summarycult2 <- summarycult %>% group_by(cultivar_name) %>% 
                 summarise (count = n())
 
-cultivartest <- merge(cultivar,summarycult2,by= "cultivar_name", all = TRUE)
-write.csv(cultivartest, "output/cultivartest.csv")
-
-
-###
-
-summarygm <- dat %>% group_by(year, technology) %>% summarise(count = n()) ##
-
 dat <- merge(dat,summarycult2, by="cultivar_name")
 names(dat)[names(dat) == 'count'] <- 'cult_nvals'
 dat <- dat[!dat$cult_nvals== "1",]
 
-summarygm2 <- dat %>% group_by(year, technology) %>% summarise(count = n()) ##
 
 ##################
 summaryloc <- dat %>% group_by(year, locality) %>% 
@@ -267,7 +283,7 @@ genetics <- genetics[,c("year", "provence", "locality", "cultivar_name", "yield"
 
 write.csv(genetics, "output/cultivartest.csv")
 
-summary(dat)
+summary(dat$provence)
 
 #number of trials by year
 
@@ -336,6 +352,22 @@ A152 <- dat[dat$cultivar_name == "A152",]
 
 
 summarycult <- dat %>% group_by(cultivar_name, year, release_year) %>% summarise(count = n())
+
+dat$release_year[is.na(dat$release_year)] <- ""
+
+norelease <- dat[dat$release_year == "",]
+
+summaryrelease <- norelease %>% group_by(release_year, cultivar_name) %>% 
+  summarise(count = n())
+
+
+
+
+
+
+
+
+
 
 ```
 
