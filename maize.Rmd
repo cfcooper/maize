@@ -16,6 +16,8 @@ rm(list=ls()) # Caution: this clears the Environment
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
 p_load(dplyr, ggplot2, stringr, stringi,readr)
+library(ggplot2)
+
 
 # Read data and stack
 rawdat <- list.files(path="data/rawdat", pattern="*csv", full.names = T)
@@ -206,7 +208,7 @@ dat <- dat[!(dat$yield == "" | is.na(dat$yield)), ]
 
 names(dat)[names(dat) == "release_year.y"] <- "release_year"
 
-dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year")]
+dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year", "land_type")]
 
 
 
@@ -216,6 +218,8 @@ norelease <- dat[dat$release_year == "",]
 
 summaryrelease <- norelease %>% group_by(release_year, cultivar_name) %>% 
   summarise(count = n())
+write.csv(summaryrelease, "output/noreleasedate.csv")
+
 ### Left off here - identify cultivars with no release date
 
 ####
@@ -280,6 +284,15 @@ genetics <- dat[dat$cultivar_name == "CRN3505",]
 genetics2 <- dat[dat$cultivar_name == "DKC78-15B",]
 genetics <- bind_rows(genetics,genetics2)
 genetics <- genetics[,c("year", "provence", "locality", "cultivar_name", "yield", "color", "technology", "Bt")]
+
+summarygen <- genetics %>% 
+  group_by(year, cultivar_name, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(data = summarygen, aes(x = year, y = mean)) + geom_smooth(aes(color=cultivar_name))
+
+print(p)
 
 write.csv(genetics, "output/cultivartest.csv")
 
