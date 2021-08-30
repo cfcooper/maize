@@ -137,17 +137,30 @@ prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
 
 ### derivative of each quadratic curve
 
+
+
+
+
+
+
 install.packages("polynom")
 library(polynom)
 
 install.packages("Deriv")
 library(Deriv)
 
-Deriv(fs_reg, )
+deriv(fs_reg)
 
 
+optimize(reg3, interval=c(2000, 2015), maximum=TRUE)
+
+pc <- coef(reg3)
+D1 = pc[1] + 2*pc[3]*pred$P + 3*cf[4]*pred$P^2
 
 
+x <- with(dat, year[year == 1])
+
+max(prov$ysq_effect)
 
 
 
@@ -177,7 +190,6 @@ summary(breg3)
 
 ## peak graphs
 ggplot(data=prov)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect, color=provence))
 
 ggplot(data=FS)+
@@ -313,7 +325,7 @@ colgg2
 
 # Breakpoint Analysis / Piecewise Linear Regression / Segmented Regression
 
-breakreg2 <- segmented.glm(reg2, seg.Z =~year)
+breakreg3 <- segmented.glm(reg3, seg.Z =~year)
 summary(breakreg2)
 
 breakfs <- segmented.glm(fs_reg, seg.Z =~ysq_effect)
