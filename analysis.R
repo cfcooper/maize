@@ -137,31 +137,12 @@ prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
 
 ### derivative of each quadratic curve
 
-
-
-
-
-
-
-install.packages("polynom")
-library(polynom)
-
-install.packages("Deriv")
-library(Deriv)
-
-deriv(fs_reg)
-
-
-optimize(reg3, interval=c(2000, 2015), maximum=TRUE)
-
-pc <- coef(reg3)
-D1 = pc[1] + 2*pc[3]*pred$P + 3*cf[4]*pred$P^2
-
-
-x <- with(dat, year[year == 1])
+breakpoint <- data.frame(0,0,0)
+colnames(breakpoint) <- c('provence', 'ysq_effectmax', 'year')
 
 max(prov$ysq_effect)
 
+breakpoint$provence <- if_else(prov$ysq_effect == max(prov$ysq_effect), prov$provence, 0)
 
 
 
@@ -171,14 +152,13 @@ max(prov$ysq_effect)
 ## different specifications - quadratic, sin(year) and cosine(year)
 # run for bt and bt stacked only
 
-breg1 <- glm(yield ~ provence + factor(year) + GM + color, data=allb)
-summary(breg1)
 
-breg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color, data=allb)
-summary(breg2)
 
-breg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=allb)
-summary(breg3)
+### 
+
+
+
+
 
 
 
@@ -190,7 +170,8 @@ summary(breg3)
 
 ## peak graphs
 ggplot(data=prov)+
-  geom_line(aes(year, ysq_effect, color=provence))
+  geom_line(aes(year, ysq_effect, color=provence))+
+  coord_cartesian(xlim = c(2005,2012), ylim = c(.2,.4), clip = "on")
 
 ggplot(data=FS)+
   #geom_line(aes(year, y_effect))+
