@@ -3,14 +3,11 @@ rm(list=ls()) # Caution: this clears the Environment
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-p_load(merTools,
-       sandwich,
+p_load(sandwich,
        lmtest,
        gtsummary,
        segmented,
-       jtools,
-       Rcpp,
-       kableExtra)
+       Rcpp)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -58,14 +55,14 @@ post$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post
 
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
-reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color, data=dat)
+reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
 summary(reg3)
 
 ## subset dat by provence and run new regs.
 
 #1
 FS <- dat[dat$provence == "FS",]
-fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=dat[dat$provence == "FS",])
+fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat[dat$provence == "FS",])
 summary(fs_reg)
 
 FS$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year
@@ -74,7 +71,7 @@ FS$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$yea
 
 #2
 GP <- dat[dat$provence == "GP",]
-gp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=GP)
+gp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=GP)
 summary(gp_reg)
 
 GP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * GP$year
@@ -82,7 +79,7 @@ GP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * GP$yea
 
 #3
 MP <- dat[dat$provence == "MP",]
-mp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=MP)
+mp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=MP)
 summary(mp_reg)
 
 MP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * MP$year
@@ -90,7 +87,7 @@ MP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * MP$yea
 
 #4
 NW <- dat[dat$provence == "NW",]
-nw_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=NW)
+nw_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=NW)
 summary(nw_reg)
 
 NW$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NW$year
@@ -98,7 +95,7 @@ NW$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NW$yea
 
 #5
 KZN <- dat[dat$provence == "KZN",]
-kzn_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=KZN)
+kzn_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=KZN)
 summary(kzn_reg)
 
 KZN$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * KZN$year
@@ -106,7 +103,7 @@ KZN$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * KZN$y
 
 #6
 EC <- dat[dat$provence == "EC",]
-ec_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=EC)
+ec_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=EC)
 summary(ec_reg)
 
 EC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * EC$year
@@ -114,7 +111,7 @@ EC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * EC$yea
 
 #7
 LP <- dat[dat$provence == "LP",]
-lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=LP)
+lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=LP)
 summary(lp_reg)
 
 LP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * LP$year
@@ -122,7 +119,7 @@ LP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * LP$yea
 
 #8
 NC <- dat[dat$provence == "NC",]
-nc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=NC)
+nc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=NC)
 summary(nc_reg)
 
 NC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NC$year
@@ -130,13 +127,32 @@ NC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NC$yea
       
 #9
 WC <- dat[dat$provence == "WC",]
-wc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color, data=WC)
+wc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=WC)
 summary(wc_reg)
 
 WC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year
 WC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year + reg2$coefficients["GM:yearsq"] * WC$yearsq
 
 prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
+
+### derivative of each quadratic curve
+
+install.packages("polynom")
+library(polynom)
+
+install.packages("Deriv")
+library(Deriv)
+
+Deriv(fs_reg, )
+
+
+
+
+
+
+
+
+
 
 
 ## different specifications - quadratic, sin(year) and cosine(year)

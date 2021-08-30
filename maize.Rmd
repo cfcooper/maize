@@ -340,6 +340,8 @@ p <- ggplot(prr, aes(year, mean))
 p + geom_smooth(aes(color=color), size = 1)
 
 # number of cultivars by year
+summarydry <- dat %>% group_by(irrigated) %>% summarise(count = n())
+summarycult <- dat %>% group_by(cultivar_name) %>% summarise(count = n())
 summarycult <- dat %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
 summarycult <- summarycult %>% group_by(year) %>% summarise (count = n())
 
