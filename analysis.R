@@ -58,6 +58,7 @@ post$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
 summary(reg3)
 
+
 ## subset dat by provence and run new regs.
 
 #1
@@ -65,8 +66,8 @@ FS <- dat[dat$provence == "FS",]
 fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat[dat$provence == "FS",])
 summary(fs_reg)
 
-FS$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year
-FS$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * FS$year + reg2$coefficients["GM:yearsq"] * FS$yearsq
+FS$y_effect <- fs_reg$coefficients["GM"] + fs_reg$coefficients["GM:year"] * FS$year
+FS$ysq_effect <- fs_reg$coefficients["GM"] + fs_reg$coefficients["GM:year"] * FS$year + fs_reg$coefficients["GM:yearsq"] * FS$yearsq
 
 
 #2
@@ -74,75 +75,92 @@ GP <- dat[dat$provence == "GP",]
 gp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=GP)
 summary(gp_reg)
 
-GP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * GP$year
-GP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * GP$year + reg2$coefficients["GM:yearsq"] * GP$yearsq
+GP$y_effect <- gp_reg$coefficients["GM"] + gp_reg$coefficients["GM:year"] * GP$year
+GP$ysq_effect <- gp_reg$coefficients["GM"] + gp_reg$coefficients["GM:year"] * GP$year + gp_reg$coefficients["GM:yearsq"] * GP$yearsq
 
 #3
 MP <- dat[dat$provence == "MP",]
 mp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=MP)
 summary(mp_reg)
 
-MP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * MP$year
-MP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * MP$year + reg2$coefficients["GM:yearsq"] * MP$yearsq
+MP$y_effect <- mp_reg$coefficients["GM"] + mp_reg$coefficients["GM:year"] * MP$year
+MP$ysq_effect <- mp_reg$coefficients["GM"] + mp_reg$coefficients["GM:year"] * MP$year + mp_reg$coefficients["GM:yearsq"] * MP$yearsq
 
 #4
 NW <- dat[dat$provence == "NW",]
 nw_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=NW)
 summary(nw_reg)
 
-NW$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NW$year
-NW$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NW$year + reg2$coefficients["GM:yearsq"] * NW$yearsq
+NW$y_effect <- nw_reg$coefficients["GM"] + nw_reg$coefficients["GM:year"] * NW$year
+NW$ysq_effect <- nw_reg$coefficients["GM"] + nw_reg$coefficients["GM:year"] * NW$year + nw_reg$coefficients["GM:yearsq"] * NW$yearsq
 
 #5
 KZN <- dat[dat$provence == "KZN",]
 kzn_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=KZN)
 summary(kzn_reg)
 
-KZN$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * KZN$year
-KZN$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * KZN$year + reg2$coefficients["GM:yearsq"] * KZN$yearsq
+KZN$y_effect <- kzn_reg$coefficients["GM"] + kzn_reg$coefficients["GM:year"] * KZN$year
+KZN$ysq_effect <- kzn_reg$coefficients["GM"] + kzn_reg$coefficients["GM:year"] * KZN$year + kzn_reg$coefficients["GM:yearsq"] * KZN$yearsq
 
 #6
 EC <- dat[dat$provence == "EC",]
 ec_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=EC)
 summary(ec_reg)
 
-EC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * EC$year
-EC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * EC$year + reg2$coefficients["GM:yearsq"] * EC$yearsq
+EC$y_effect <- ec_reg$coefficients["GM"] + ec_reg$coefficients["GM:year"] * EC$year
+EC$ysq_effect <- ec_reg$coefficients["GM"] + ec_reg$coefficients["GM:year"] * EC$year + ec_reg$coefficients["GM:yearsq"] * EC$yearsq
 
 #7
 LP <- dat[dat$provence == "LP",]
 lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=LP)
 summary(lp_reg)
 
-LP$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * LP$year
-LP$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * LP$year + reg2$coefficients["GM:yearsq"] * LP$yearsq
+LP$y_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year
+LP$ysq_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year + lp_reg$coefficients["GM:yearsq"] * LP$yearsq
 
 #8
 NC <- dat[dat$provence == "NC",]
 nc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=NC)
 summary(nc_reg)
 
-NC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NC$year
-NC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * NC$year + reg2$coefficients["GM:yearsq"] * NC$yearsq
+NC$y_effect <- nc_reg$coefficients["GM"] + nc_reg$coefficients["GM:year"] * NC$year
+NC$ysq_effect <- nc_reg$coefficients["GM"] + nc_reg$coefficients["GM:year"] * NC$year + nc_reg$coefficients["GM:yearsq"] * NC$yearsq
       
 #9
 WC <- dat[dat$provence == "WC",]
 wc_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=WC)
 summary(wc_reg)
 
-WC$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year
-WC$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * WC$year + reg2$coefficients["GM:yearsq"] * WC$yearsq
+WC$y_effect <- wc_reg$coefficients["GM"] + wc_reg$coefficients["GM:year"] * WC$year
+WC$ysq_effect <- wc_reg$coefficients["GM"] + wc_reg$coefficients["GM:year"] * WC$year + wc_reg$coefficients["GM:yearsq"] * WC$yearsq
 
 prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
 
 ### derivative of each quadratic curve
 
 breakpoint <- data.frame(0,0,0)
-colnames(breakpoint) <- c('provence', 'ysq_effectmax', 'year')
+colnames(breakpoint) <- c('provence', 'ysq_effectmax')
+##breakpoint[nrow(breakpoint) + 1,] = list(provence=FS, ysq_effectmax= max(FS$ysq_effect))
+
+
+provence <- c("FS", "GP", "MP", "NW", "KZN", "EC", "LP", "NC", "WC")
+ysq_effect <- c(max(FS$ysq_effect), max(GP$ysq_effect), max(MP$ysq_effect),max(NW$ysq_effect), max(KZN$ysq_effect), max(EC$ysq_effect), 
+                          max(LP$ysq_effect), max(NC$ysq_effect), max(WC$ysq_effect))
+
+breakpoint <- data.frame(provence, ysq_effect)
+rm(provence, ysq_effect)
+prov2 <- prov[,c("provence", "ysq_effect", "year")]
+breakpoint2 <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
+breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
+
 
 max(prov$ysq_effect)
+max(FS$ysq_effect)
+FS[which.max(FS$ysq_effect),]
 
-breakpoint$provence <- if_else(prov$ysq_effect == max(prov$ysq_effect), prov$provence, 0)
+
+breakpoint$provence <- if_else(prov$ysq_effect == max(prov$ysq_effect), prov$provence, breakpoint$provence)
+
 
 
 
@@ -170,8 +188,8 @@ breakpoint$provence <- if_else(prov$ysq_effect == max(prov$ysq_effect), prov$pro
 
 ## peak graphs
 ggplot(data=prov)+
-  geom_line(aes(year, ysq_effect, color=provence))+
-  coord_cartesian(xlim = c(2005,2012), ylim = c(.2,.4), clip = "on")
+  geom_line(aes(year, ysq_effect, color=provence)) + 
+  coord_cartesian(xlim= c(1998,2020), ylim = c(-.2,1), clip = "on")
 
 ggplot(data=FS)+
   #geom_line(aes(year, y_effect))+

@@ -227,7 +227,7 @@ write.csv(summaryrelease, "output/noreleasedate.csv")
 dat$cultivar_release <- str_sub(dat$release_year,1,4)
 
 summarycult <- dat %>% group_by(year, cultivar_name) %>%
-                summarise(count = n()) # check cultivar if in more than one year/location
+                summarise(count = n()) # check cultivar if in more than one year
 
 summarycult2 <- summarycult %>% group_by(cultivar_name) %>% 
                 summarise (count = n())
@@ -235,6 +235,16 @@ summarycult2 <- summarycult %>% group_by(cultivar_name) %>%
 dat <- merge(dat,summarycult2, by="cultivar_name")
 names(dat)[names(dat) == 'count'] <- 'cult_nvals'
 dat <- dat[!dat$cult_nvals== "1",]
+
+
+summarycult <- dat %>% group_by(year, provence, cultivar_name) %>%
+                summarise(count = n()) # check cultivar if in more than one obersvation per provence/year
+##add unique value catch
+dat <- merge(dat,summarycult, by="cultivar_name")
+
+names(dat)[names(dat) == 'count'] <- 'cult_nvals2'
+dat <- dat[!dat$cult_nvals2== "1",]
+
 
 
 ##################
@@ -300,8 +310,8 @@ summary(dat$provence)
 
 #number of trials by year
 
-summaryloc <- dat %>% group_by(year, locality) %>% summarise(count = n()) # check location if in more than one year
-summaryloc2 <- summaryloc %>% group_by(locality) %>% summarise(count = n())
+summaryloc <- dat %>% group_by(year, provence, GM) %>% summarise(count = n()) # check location if in more than one year
+summaryloc2 <- summaryloc %>% group_by() %>% summarise(count = n())
 summaryloc3 <- summaryloc %>% group_by(year) %>% summarise (count = n()) # show how many trials per year
 
 write.csv(summaryloc, "trialsbyyear.csv")
@@ -358,6 +368,58 @@ dat <- readRDS("data/finalpanel.rds")
 
 ###cultivar tests
 ```{}
+
+genetics <- dat[dat$cultivar_name == "CRN3505",]
+
+genetics3 <- dat[dat$cultivar_name == "DKC78-15B",]
+
+genetics2 <- dat[dat$cultivar_name == "DKC78-45BR",]
+
+genetics <- bind_rows(genetics,genetics2, genetics3)
+
+genetics <- genetics[,c("year", "provence", "locality", "cultivar_name", "yield", "color", "technology", "Bt")]
+
+summarygen <- genetics %>% 
+  group_by(year, cultivar_name, Bt, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(data = summarygen, aes(x = year, y = mean)) + geom_smooth(aes(color=cultivar_name))
+print(p)
+
+
+genetics <- dat[dat$cultivar_name == "PAN4A-172",]
+
+genetics2 <- dat[dat$cultivar_name == "PAN4B-472B",]
+
+genetics3 <- dat[dat$cultivar_name == "PAN4R-872BR",]
+
+genetics4 <- dat[dat$cultivar_name == "PAN4R-672R",]
+
+genetics <- bind_rows(genetics,genetics2)
+
+genetics <- genetics[,c("year", "provence", "locality", "cultivar_name", "yield", "color", "technology", "Bt")]
+
+summarygen <- genetics %>% 
+  group_by(year, cultivar_name, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(data = summarygen, aes(x = year, y = mean)) + geom_smooth(aes(color=cultivar_name))
+print(p)
+
+
+
+
+
+
+
+
+
+
+
+
+
 CRN3505 <- dat[dat$cultivar_name == "CRN3505",]
 
 CRN7821BT <- dat[dat$cultivar_name == "CRN7821BT",]
