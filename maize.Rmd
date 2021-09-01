@@ -268,15 +268,16 @@ dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar
 
 rm(list=setdiff(ls(), "dat"))
 
-dat$Bt <- ifelse(dat$technology == "B" | 
-                      dat$technology == "BR", "Bt", "Conv")
+dat$bt <- ifelse(dat$technology %in% c("B", "BR"), 1, 0)
 
 summaryold <- dat %>% 
   group_by(color, technology, Bt, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
+noR <- dat[!(dat$technology == "R"),]
+
 summaryall <- dat %>% 
-  group_by(color, technology, Bt, year, .add = FALSE) %>% 
+  group_by(color, technology, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
@@ -318,13 +319,14 @@ write.csv(summaryloc, "trialsbyyear.csv")
 
 # white mean by year
 color <- dat %>% group_by(color) %>% summarise (count = n())
-pwhite <- dat %>% filter(color == "white") %>%
+pwhite <- noR %>% filter(color == "white") %>%
             group_by(color,technology, year, .add = FALSE) %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(pwhite, aes(year, mean))
-p + geom_smooth(aes(color=technology), size = 1)
+p<- ggplot(pwhite, aes(year, mean)) + geom_smooth(aes(color=technology), size = 1) + ggtitle('White Yield Over Time')
+plot(p)
+
 
 pdry <- dat %>% filter(irrigated == 0) %>%
            group_by(color,technology, year, .add = FALSE) %>%
@@ -337,8 +339,11 @@ pbt <- dat %>% filter(technology == "B") %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(pbt, aes(year, mean))
-p + geom_smooth(aes(color=color), size = 1)
+p <- ggplot(pbt, aes(year, mean)) + geom_smooth(aes(color=color), size = 1) + ggtitle('Bt Yield Over Time')
+plot(p)
+
+
+
 
 # RR mean by year
 prr <- dat %>% filter(technology == "R") %>%
