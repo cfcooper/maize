@@ -220,32 +220,27 @@ summaryrelease <- norelease %>% group_by(release_year, cultivar_name) %>%
   summarise(count = n())
 write.csv(summaryrelease, "output/noreleasedate.csv")
 
-### Left off here - identify cultivars with no release date
-
-####
-
 dat$cultivar_release <- str_sub(dat$release_year,1,4)
 
 summarycult <- dat %>% group_by(year, cultivar_name) %>%
-                summarise(count = n()) # check cultivar if in more than one year
+                summarise(count = n()) # check if cultivar has more than one observation peryear
+summarycult <- summarycult[summarycult$count== "1",]
 
-summarycult2 <- summarycult %>% group_by(cultivar_name) %>% 
-                summarise (count = n())
-
-dat <- merge(dat,summarycult2, by="cultivar_name")
+####
+dat <- merge(dat,summarycult, by = c("year","cultivar_name"),all = TRUE, no.dups= TRUE)
 names(dat)[names(dat) == 'count'] <- 'cult_nvals'
-dat <- dat[!dat$cult_nvals== "1",]
+dat$cult_nvals <- if_else(dat$cult_nvals %in% c(NA), "0", "1")
+dat <- dat[!dat$cult_nvals== "1", ]
 
 
 summarycult <- dat %>% group_by(year, provence, cultivar_name) %>%
                 summarise(count = n()) # check cultivar if in more than one obersvation per provence/year
-##add unique value catch
-dat <- merge(dat,summarycult, by="cultivar_name")
+summarycult <- summarycult[summarycult$count== "1",]
+dat <- merge(dat,summarycult, by = c("year","cultivar_name", "provence"),all = TRUE, no.dups= TRUE)
+dat$count <- if_else(dat$count %in% c(NA), "0", "1")
+dat <- dat[!dat$count== "1", ]
 
-names(dat)[names(dat) == 'count'] <- 'cult_nvals2'
-dat <- dat[!dat$cult_nvals2== "1",]
-
-
+dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated","land_type", "number", "release_year")]
 
 ##################
 summaryloc <- dat %>% group_by(year, locality) %>% 
@@ -263,7 +258,7 @@ dat$land_type[is.na(dat$land_type)] <- ""
 dat$land_type[dat$land_type == "Irrigation"] <- "Irrigated"
 dat$irrigated <- if_else(dat$land_type == "Irrigated", 1, dat$irrigated)
 
-dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "alternate", "cultivar_no", "cultivar_br", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "number", "release_year")]
+dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar_name", "rep", "yield", "color", "technology", "Bt", "crop", "temp", "irrigated", "release_year")]
 
 
 rm(list=setdiff(ls(), "dat"))

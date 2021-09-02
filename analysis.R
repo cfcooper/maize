@@ -151,20 +151,26 @@ breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
 prov2 <- prov[,c("provence", "ysq_effect", "year")]
 breakpoint2 <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
+breakpoint <- breakpoint2[!duplicated(breakpoint2), ]
+
+summaryb <- bonly %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
+
+write.csv(breakpoint, "output/peakbt.csv")
+
+summaryb2 <- bonly %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(count = n())
+
+breakpoint2 <- merge(breakpoint, summaryb2, by = c("provence","year","color"), no.dups = TRUE)
+breakpoint2 <- breakpoint2[,c("year", "provence", "color", "ysq_effect", "mean", "SD", "count")]
 breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 
-
-max(prov$ysq_effect)
-max(FS$ysq_effect)
-FS[which.max(FS$ysq_effect),]
-
-
-breakpoint$provence <- if_else(prov$ysq_effect == max(prov$ysq_effect), prov$provence, breakpoint$provence)
-
-
-
-
-
+write.csv(breakpoint2, "output/peakbt.csv")
 
 
 ## different specifications - quadratic, sin(year) and cosine(year)
