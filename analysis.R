@@ -50,20 +50,27 @@ summary(reg2)
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
-post$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year
-post$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * post$year + reg2$coefficients["GM:yearsq"] * post$yearsq
-
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
 summary(reg3)
 
+## require 5 obs per year per provence
+summaryobs <- dat %>% group_by(year, provence, color, bt) %>%
+  summarise(count = n()) # check bt if in more than one obersvation per provence/year
+summaryobs <- summaryobs[summaryobs$count < 5,]
+summaryobs$count <- "1"
+dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE, no.dups= TRUE)
+dat$count <- if_else(dat$count %in% c(NA), "0", "1")
+dat <- dat[!dat$count== "1", ]
 
-## subset dat by provence and run new regs.
+
+
 
 #1
 FS <- dat[dat$provence == "FS",]
-fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat[dat$provence == "FS",])
+FS <- FS[!FS$year == "2004",]
+fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=FS)
 summary(fs_reg)
 
 FS$y_effect <- fs_reg$coefficients["GM"] + fs_reg$coefficients["GM:year"] * FS$year
@@ -134,24 +141,28 @@ summary(wc_reg)
 WC$y_effect <- wc_reg$coefficients["GM"] + wc_reg$coefficients["GM:year"] * WC$year
 WC$ysq_effect <- wc_reg$coefficients["GM"] + wc_reg$coefficients["GM:year"] * WC$year + wc_reg$coefficients["GM:yearsq"] * WC$yearsq
 
-prov <- rbind(FS, GP, MP, NW, KZN, EC, LP, NC, WC)
+prov <- rbind(FS, GP, MP, NW, KZN, LP, NC, WC)
 
-### derivative of each quadratic curve
+### yield gains peak
 
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-##breakpoint[nrow(breakpoint) + 1,] = list(provence=FS, ysq_effectmax= max(FS$ysq_effect))
+provence <- c("FS", "GP", "MP", "NW", "KZN", "LP", "NC", "WC")
 
-
-provence <- c("FS", "GP", "MP", "NW", "KZN", "EC", "LP", "NC", "WC")
-ysq_effect <- c(max(FS$ysq_effect), max(GP$ysq_effect), max(MP$ysq_effect),max(NW$ysq_effect), max(KZN$ysq_effect), max(EC$ysq_effect), 
-                          max(LP$ysq_effect), max(NC$ysq_effect), max(WC$ysq_effect))
+ysq_effect <- c(max(FS$ysq_effect), 
+                max(GP$ysq_effect), 
+                max(MP$ysq_effect),
+                max(NW$ysq_effect), 
+                max(KZN$ysq_effect), 
+                max(LP$ysq_effect), 
+                max(NC$ysq_effect), 
+                max(WC$ysq_effect))
 
 breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
 prov2 <- prov[,c("provence", "ysq_effect", "year")]
-breakpoint2 <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
-breakpoint <- breakpoint2[!duplicated(breakpoint2), ]
+breakpoint <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
+breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
 summaryb <- bonly %>%
   group_by(color, year, provence, .add = FALSE) %>%
@@ -159,8 +170,6 @@ summaryb <- bonly %>%
             SD = sd(yield, na.rm = T))
 
 breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
-
-write.csv(breakpoint, "output/peakbt.csv")
 
 summaryb2 <- bonly %>%
   group_by(color, year, provence, .add = FALSE) %>%
@@ -173,24 +182,22 @@ breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 write.csv(breakpoint2, "output/peakbt.csv")
 
 
+#### summary of of Bt observations in FS
+summaryfs <- bonly %>% filter(provence == "FS") %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(count = n())
+
+write.csv(summaryfs, "output/btFSsummary.csv")
+
+#### summary of of Bt observations in EC
+summaryec <- bonly %>% filter(provence == "EC") %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(count = n())
+
+
 ## different specifications - quadratic, sin(year) and cosine(year)
 # run for bt and bt stacked only
 
-
-
-### 
-
-
-
-
-
-
-
-# only bt
-
-
-
-## peak graphs
 
 ## peak graphs
 ggplot(data=prov)+
@@ -198,39 +205,30 @@ ggplot(data=prov)+
   coord_cartesian(xlim= c(1998,2020), ylim = c(-.2,1), clip = "on")
 
 ggplot(data=FS)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=GP)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=MP)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=NW)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=KZN)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=EC)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=LP)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=NC)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ggplot(data=WC)+
-  #geom_line(aes(year, y_effect))+
   geom_line(aes(year, ysq_effect))
 
 ###################################

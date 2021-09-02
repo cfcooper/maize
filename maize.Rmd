@@ -78,6 +78,8 @@ write.csv(summarynew, "output/summary.csv")
 
 ```{r data merging, include=false}
 olddat <- read.csv("data/metadata/allmaize1980_2010.csv")
+olddat2 <- [(olddat$year == 2004),]
+
 location <- read.csv("data/metadata/oldlocality.csv")
 
 location$locality <- tolower(location$locality)
