@@ -78,7 +78,6 @@ write.csv(summarynew, "output/summary.csv")
 
 ```{r data merging, include=false}
 olddat <- read.csv("data/metadata/allmaize1980_2010.csv")
-olddat2 <- [(olddat$year == 2004),]
 
 location <- read.csv("data/metadata/oldlocality.csv")
 
@@ -287,6 +286,47 @@ write.csv(dat,"data/allyearsmerge.csv")
 
 ```{r datasummary stats, include=false}
 #summ stats
+
+noR <- dat[!(dat$technology == "R"),]
+#conventional summ stat
+convsummarystat <- noR %>%
+  filter(technology== "conv") %>%
+  group_by(color, technology, provence, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+                      SD = sd(yield, na.rm = T), 
+                      max = max(yield, na.rm = T), 
+                      min = min(yield, na.rm = T))
+            
+
+#bt summ stat
+btsummarystat <- noR %>%
+  filter(technology== "B"| technology == "BR") %>%
+  group_by(color, technology, provence, year, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+                      SD = sd(yield, na.rm = T), 
+                      max = max(yield, na.rm = T), 
+                      min = min(yield, na.rm = T))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 genetics <- dat[dat$cultivar_name == "CRN3505",]
 genetics2 <- dat[dat$cultivar_name == "DKC78-15B",]

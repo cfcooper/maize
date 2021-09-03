@@ -9,6 +9,8 @@ p_load(sandwich,
        segmented,
        Rcpp)
 
+
+
 dat <- readRDS("data/finalpanel.rds")
 
 dat %>%
@@ -51,6 +53,7 @@ dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$yea
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
 max(dat$ysq_effect)
+
 
 
 # Provence by year by GM effects in one model
@@ -203,6 +206,10 @@ write.csv(summaryfs, "output/btFSsummary.csv")
 summaryec <- bonly %>% filter(provence == "EC") %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
+
+### predict economic loss
+
+
 
 
 ## different specifications - quadratic, sin(year) and cosine(year)
