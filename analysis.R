@@ -50,6 +50,9 @@ summary(reg2)
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
+max(dat$ysq_effect)
+
+
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
@@ -69,7 +72,7 @@ dat <- dat[!dat$count== "1", ]
 
 #1
 FS <- dat[dat$provence == "FS",]
-FS <- FS[!FS$year == "2004",]
+##FS <- FS[!FS$year == "2004",]
 fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=FS)
 summary(fs_reg)
 
@@ -141,21 +144,29 @@ summary(wc_reg)
 WC$y_effect <- wc_reg$coefficients["GM"] + wc_reg$coefficients["GM:year"] * WC$year
 WC$ysq_effect <- wc_reg$coefficients["GM"] + wc_reg$coefficients["GM:year"] * WC$year + wc_reg$coefficients["GM:yearsq"] * WC$yearsq
 
-prov <- rbind(FS, GP, MP, NW, KZN, LP, NC, WC)
+#combine NC, NW, FS
+northregion <- bind_rows(NC, NW, FS)
+north_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=northregion)
+summary(north_reg)
+
+northregion$y_effect <- north_reg$coefficients["GM"] + north_reg$coefficients["GM:year"] * northregion$year
+northregion$ysq_effect <- north_reg$coefficients["GM"] + north_reg$coefficients["GM:year"] * northregion$year + north_reg$coefficients["GM:yearsq"] * northregion$yearsq
+
+northregion$provence <- "northregion"
+prov <- rbind(northregion, GP, MP, KZN, LP, WC)
+#prov <- rbind(FS, GP, MP, NW, KZN, LP, NC, WC)
 
 ### yield gains peak
 
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-provence <- c("FS", "GP", "MP", "NW", "KZN", "LP", "NC", "WC")
+provence <- c("northregion", "GP", "MP", "KZN", "LP", "WC")
 
-ysq_effect <- c(max(FS$ysq_effect), 
+ysq_effect <- c(max(northregion$ysq_effect), 
                 max(GP$ysq_effect), 
-                max(MP$ysq_effect),
-                max(NW$ysq_effect), 
+                max(MP$ysq_effect), 
                 max(KZN$ysq_effect), 
                 max(LP$ysq_effect), 
-                max(NC$ysq_effect), 
                 max(WC$ysq_effect))
 
 breakpoint <- data.frame(provence, ysq_effect)
@@ -164,14 +175,13 @@ prov2 <- prov[,c("provence", "ysq_effect", "year")]
 breakpoint <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
 breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
-summaryb <- bonly %>%
-  group_by(color, year, provence, .add = FALSE) %>%
+summaryb <- prov %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
 breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
 
-summaryb2 <- bonly %>%
+summaryb2 <- prov %>% filter(bt == 1) %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
 
@@ -200,6 +210,11 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
 
 
 ## peak graphs
+ggplot(data=dat)+
+  geom_line(aes(year, ysq_effect)) + 
+  coord_cartesian(xlim= c(1998,2020), ylim = c(-.05,.5), clip = "on")
+
+
 ggplot(data=prov)+
   geom_line(aes(year, ysq_effect, color=provence)) + 
   coord_cartesian(xlim= c(1998,2020), ylim = c(-.2,1), clip = "on")
