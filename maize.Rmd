@@ -17,6 +17,8 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 p_load(dplyr, ggplot2, stringr, stringi,readr)
 library(ggplot2)
+install.packages("gt")
+library(gt)
 
 
 # Read data and stack
@@ -296,7 +298,31 @@ convsummarystat <- noR %>%
                       SD = sd(yield, na.rm = T), 
                       max = max(yield, na.rm = T), 
                       min = min(yield, na.rm = T))
-            
+
+convsummarystat <- convsummarystat %>%
+            gt(rowname_col = "province") %>%
+  tab_header(
+    title = "Conventional Yields by Province",
+    subtitle = glue::glue("subtitle")
+  ) %>%
+  cols_label(
+    provence = html("Province"),
+    mean = html("Mean"),
+    SD = html("SD"),
+    max = html("Max"),
+    min = html("Min"))
+summary(convsummarystat)
+
+      convsummarystat <- convsummarystat %>%  
+  fmt_number(
+    columns = 2:5,
+    decimals = 3
+  )
+  
+  
+print(convsummarystat)
+  
+  
 
 #bt summ stat
 btsummarystat <- noR %>%
@@ -309,6 +335,7 @@ btsummarystat <- noR %>%
 
 
 
+```
 
 
 
@@ -325,8 +352,7 @@ btsummarystat <- noR %>%
 
 
 
-
-
+```{r datasummary stats, include=false}
 
 genetics <- dat[dat$cultivar_name == "CRN3505",]
 genetics2 <- dat[dat$cultivar_name == "DKC78-15B",]
