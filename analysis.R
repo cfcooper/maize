@@ -194,6 +194,67 @@ breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 
 write.csv(breakpoint2, "output/peakbt.csv")
 
+##finding lost gains BY PROV
+gploss <- GP %>% filter(bt == 1) %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+gploss <- merge(GP, gploss, by = c("provence","year","color"), no.dups = TRUE)
+gploss <- gploss[,c("year", "provence", "color","technology", "ysq_effect", "mean", "SD")]
+
+gploss <- gploss[gploss$technology == "B",]
+gploss <- gploss[!duplicated(gploss), ]
+gploss$maxysq <- ifelse(gploss$year<2010, NA, max(gploss$ysq_effect))
+gploss$gain_loss <- gploss$ysq_effect - gploss$maxysq
+
+
+ggplot(data=gploss)+
+  geom_line(aes(year, ysq_effect)) + 
+  geom_line(aes(year, maxysq)) + 
+  coord_cartesian(xlim= c(1998,2020), ylim = c(.0,.5), clip = "on")
+
+##finding lost gains ALL
+allb <- dat[dat$technology == "B",]
+totalloss <- allb %>% filter(technology == "B") %>%
+  group_by(year, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+totalloss <- merge(allb, totalloss, by = c("year"), no.dups = TRUE)
+totalloss <- totalloss[,c("year", "ysq_effect", "mean", "SD")]
+totalloss <- totalloss[!duplicated(totalloss), ]
+totalloss$maxysq <- ifelse(totalloss$year<2011, NA, max(totalloss$ysq_effect))
+totalloss$gain_loss <- totalloss$ysq_effect - totalloss$maxysq
+
+ggplot(data=totalloss)+
+  geom_line(aes(year, ysq_effect)) + 
+  geom_line(aes(year, maxysq)) + 
+  coord_cartesian(xlim= c(1998,2020), ylim = c(.0,.5), clip = "on")
+
+
+maizeprod <- read.csv("data/metadata/maizeproduction.csv")
+
+names(maizeprod)[2:4] <- c("percentBt","1000ha", "totalmaizehectare")
+maizeprod$percentBt <- ifelse(is.na(maizeprod$percentBt), .29, maizeprod$percentBt)
+maizeprod$Bthectare <- maizeprod$percentBt*maizeprod$totalmaizehectare
+
+totalloss <- merge(totalloss, maizeprod, by = c("year"), no.dups = TRUE)
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "Bthectare","priceton")]
+totalloss$mtloss <- (totalloss$gain_loss*totalloss$Bthectare)*-1
+totalloss$yearlyloss <- totalloss$mtloss*totalloss$priceton
+totalloss$losssum <- lag(totalloss$yearlyloss) + totalloss$yearlyloss
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "losssum")]
+
+write.csv(totalloss, "output/totalloss.csv")
+
+ggplot(data=totalloss)+
+  geom_col(aes(year, yearlyloss, color = darkseagreen4)) + 
+  geom_line(aes(year, losssum), size = 1) +
+  scale_fill_distiller(palette = "Greens") +
+  theme_minimal() +
+  labs(title = "Economic Loss") +
+  coord_cartesian(xlim= c(1998,2020), clip = "on")
+
+
 
 #### summary of of Bt observations in FS
 summaryfs <- bonly %>% filter(provence == "FS") %>%

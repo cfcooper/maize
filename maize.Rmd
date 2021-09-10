@@ -496,15 +496,19 @@ A152 <- dat[dat$cultivar_name == "A152",]
 
 
 
-summarycult <- dat %>% group_by(cultivar_name, year, release_year) %>% summarise(count = n())
+sumrel <- dat %>% filter(technology == "B") %>% group_by(technology, release_year) %>% summarise(count = n())
+write.csv(sumrel, "brelease.csv")
+
 
 dat$release_year[is.na(dat$release_year)] <- ""
 
-norelease <- dat[dat$release_year == "",]
 
-summaryrelease <- norelease %>% group_by(release_year, cultivar_name) %>% 
+norelease2 <- prov[prov$release_year == "",]
+
+summaryrelease2 <- prov %>% filter(technology == "B") %>% group_by(year,release_year,technology, cultivar_name) %>% 
   summarise(count = n())
-
+summaryrelease2 <- summaryrelease2[summaryrelease2$technology == "B",]
+write.csv(summaryrelease2, "noreleaseb4.csv")
 
 
 
