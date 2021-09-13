@@ -238,13 +238,44 @@ maizeprod$percentBt <- ifelse(is.na(maizeprod$percentBt), .29, maizeprod$percent
 maizeprod$Bthectare <- maizeprod$percentBt*maizeprod$totalmaizehectare
 
 totalloss <- merge(totalloss, maizeprod, by = c("year"), no.dups = TRUE)
-totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "Bthectare","priceton")]
+
+##totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "Bthectare","priceton")]
+
 totalloss$mtloss <- (totalloss$gain_loss*totalloss$Bthectare)*-1
 totalloss$yearlyloss <- totalloss$mtloss*totalloss$priceton
 totalloss$losssum <- lag(totalloss$yearlyloss) + totalloss$yearlyloss
 totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "losssum")]
 
 write.csv(totalloss, "output/totalloss.csv")
+
+## Cleaned Tables
+
+cleanedloss <- totalloss[totalloss$year > 2010,]
+cleanedloss[is.na(cleanedloss)] <- 0  
+
+##cleanedloss <- cleanedloss %>%
+  gt(rowname_col = "province") %>%
+  tab_header(
+    title = "Conventional Yields by Province",
+    subtitle = glue::glue("subtitle")
+  ) %>%
+  cols_label(
+    provence = html("Province"),
+    mean = html("Mean"),
+    SD = html("SD"),
+    max = html("Max"),
+    min = html("Min"))
+##summary(cleanedloss)
+
+##cleanedloss <- cleanedloss %>%  
+  fmt_number(
+    columns = 2:5,
+    decimals = 3
+  )
+
+
+##print(cleanedloss)
+
 
 ggplot(data=totalloss)+
   geom_col(aes(year, yearlyloss, color = darkseagreen4)) + 
