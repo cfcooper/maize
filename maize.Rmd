@@ -217,11 +217,11 @@ dat <- dat[,c("year", "region", "provence", "locality", "locality_no", "cultivar
 
 summarycult <- dat %>% group_by(cultivar_name, year, release_year) %>% summarise(count = n())
 
-norelease <- dat[dat$release_year == "",]
+bandconvelease <- dat[dat$release_year == "",]
 
-summaryrelease <- norelease %>% group_by(release_year, cultivar_name) %>% 
+summaryrelease <- bandconvelease %>% group_by(release_year, cultivar_name) %>% 
   summarise(count = n())
-write.csv(summaryrelease, "output/noreleasedate.csv")
+write.csv(summaryrelease, "output/bandconveleasedate.csv")
 
 dat$cultivar_release <- str_sub(dat$release_year,1,4)
 
@@ -272,7 +272,7 @@ summaryold <- dat %>%
   group_by(color, technology, Bt, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
-noR <- dat[!(dat$technology == "R"),]
+bandconv <- dat[!(dat$technology == "R"),]
 
 summaryall <- dat %>% 
   group_by(color, technology, year, .add = FALSE) %>% 
@@ -289,49 +289,60 @@ write.csv(dat,"data/allyearsmerge.csv")
 ```{r datasummary stats, include=false}
 #summ stats
 
-noR <- dat[!(dat$technology == "R"),]
-#conventional summ stat
-convsummarystat <- noR %>%
-  filter(technology== "conv") %>%
-  group_by(color, technology, provence, .add = FALSE) %>% 
-            summarise(mean = mean(yield, na.rm = T), 
-                      SD = sd(yield, na.rm = T), 
-                      max = max(yield, na.rm = T), 
-                      min = min(yield, na.rm = T))
+bandconv <- dat[dat$technology %in% c("B", "conv"),]
 
-convsummarystat <- convsummarystat %>%
+
+#bt summ stat
+
+btsummarystat <- bandconv %>%
+  group_by(technology, provence, .add = FALSE) %>% 
+            summarise(across(.cols = everything(),
+                list(yield = mean(yield, na.rm = T),
+                      SD = sd(yield, na.rm = T),
+                      min = min(year, na.rm = T),
+                      max = max(year, na.rm = T))))
+
+btsummarystat2 <- bandconv %>%
+    group_by(technology, provence, cultivar_name) %>%
+      count()
+
+btsummarystat3 <- btsummarystat2 %>%
+    group_by(technology,provence) %>%
+      count()
+
+btsummarystat4 <- bandconv  %>%
+    group_by(technology, provence) %>%
+      count()
+
+btsummarystat <- merge(btsummarystat, btsummarystat3, by = c("provence","technology"))
+names(btsummarystat)[names(btsummarystat) == "n"] <- "num_of_cultivars"
+names(btsummarystat4)[names(btsummarystat4) == "n"] <- "num_of_observations"
+btsummarystat <- merge(btsummarystat, btsummarystat4, by = "provence", "technology")
+
+btsummarystat <- btsummarystat %>%
             gt(rowname_col = "province") %>%
   tab_header(
-    title = "Conventional Yields by Province",
-    subtitle = glue::glue("subtitle")
+    title = "Characteristics of Provinces",
+    subtitle = glue::glue("observations included in sample")
   ) %>%
   cols_label(
     provence = html("Province"),
-    mean = html("Mean"),
-    SD = html("SD"),
-    max = html("Max"),
-    min = html("Min"))
-summary(convsummarystat)
-
-      convsummarystat <- convsummarystat %>%  
+    yield = html("Average Yield"),
+    min = html("Min Year"),
+    max = html("Max Year"),
+    num_of_cultivars = html("num of cultivars"),
+    num_of_observations = html("num of observations")) %>%
+  cols_align(
+    align = "center",
+    columns = everything())  %>%
   fmt_number(
-    columns = 2:5,
-    decimals = 3
-  )
-  
-  
-print(convsummarystat)
-  
-  
+    columns = yield,
+    decimals = 3)
 
-#bt summ stat
-btsummarystat <- noR %>%
-  filter(technology== "B"| technology == "BR") %>%
-  group_by(color, technology, provence, year, .add = FALSE) %>% 
-            summarise(mean = mean(yield, na.rm = T), 
-                      SD = sd(yield, na.rm = T), 
-                      max = max(yield, na.rm = T), 
-                      min = min(yield, na.rm = T))
+     
+  
+print(btsummarystat)
+
 
 
 
@@ -382,7 +393,7 @@ write.csv(summaryloc, "trialsbyyear.csv")
 
 # white mean by year
 color <- dat %>% group_by(color) %>% summarise (count = n())
-pwhite <- noR %>% filter(color == "white") %>%
+pwhite <- bandconv %>% filter(color == "white") %>%
             group_by(color,technology, year, .add = FALSE) %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
@@ -503,12 +514,12 @@ write.csv(sumrel, "brelease.csv")
 dat$release_year[is.na(dat$release_year)] <- ""
 
 
-norelease2 <- prov[prov$release_year == "",]
+bandconvelease2 <- prov[prov$release_year == "",]
 
 summaryrelease2 <- prov %>% filter(technology == "B") %>% group_by(year,release_year,technology, cultivar_name) %>% 
   summarise(count = n())
 summaryrelease2 <- summaryrelease2[summaryrelease2$technology == "B",]
-write.csv(summaryrelease2, "noreleaseb4.csv")
+write.csv(summaryrelease2, "bandconveleaseb4.csv")
 
 
 

@@ -42,7 +42,6 @@ sum_prereg
 reg1 <- glm(yield ~ provence + factor(year) + GM + color + irrigated, data=dat)
 summary(reg1)
 
-#summ(reg1)
 
 dat$yearsq <- dat$year*dat$year
 
