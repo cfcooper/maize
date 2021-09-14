@@ -296,11 +296,10 @@ bandconv <- dat[dat$technology %in% c("B", "conv"),]
 
 btsummarystat <- bandconv %>%
   group_by(technology, provence, .add = FALSE) %>% 
-            summarise(across(.cols = everything(),
-                list(yield = mean(yield, na.rm = T),
+            summarise(yield = mean(yield, na.rm = T),
                       SD = sd(yield, na.rm = T),
                       min = min(year, na.rm = T),
-                      max = max(year, na.rm = T))))
+                      max = max(year, na.rm = T))
 
 btsummarystat2 <- bandconv %>%
     group_by(technology, provence, cultivar_name) %>%
