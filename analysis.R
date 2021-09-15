@@ -8,8 +8,8 @@ p_load(sandwich,
        gtsummary,
        segmented,
        Rcpp)
-
-
+install.packages("RColorBrewer")
+library(RColorBrewer)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -252,38 +252,18 @@ write.csv(totalloss, "output/totalloss.csv")
 cleanedloss <- totalloss[totalloss$year > 2010,]
 cleanedloss[is.na(cleanedloss)] <- 0  
 
-##cleanedloss <- cleanedloss %>%
-  gt(rowname_col = "province") %>%
-  tab_header(
-    title = "Conventional Yields by Province",
-    subtitle = glue::glue("subtitle")
-  ) %>%
-  cols_label(
-    provence = html("Province"),
-    mean = html("Mean"),
-    SD = html("SD"),
-    max = html("Max"),
-    min = html("Min"))
-##summary(cleanedloss)
-
-##cleanedloss <- cleanedloss %>%  
-  fmt_number(
-    columns = 2:5,
-    decimals = 3
-  )
 
 
-##print(cleanedloss)
-
-
-ggplot(data=totalloss)+
-  geom_col(aes(year, yearlyloss, color = darkseagreen4)) + 
-  geom_line(aes(year, losssum), size = 1) +
-  scale_fill_distiller(palette = "Greens") +
-  theme_minimal() +
+ggloss <- ggplot(totalloss,aes(x = year, y = yearlyloss, fill = year))+
+  theme_bw() +
+  geom_bar(fill="#3CA9CA", width=.8, stat="identity") +
+  scale_y_continuous(labels = scales::unit_format(unit = "M", scale = 1e-6)) +
   labs(title = "Economic Loss") +
-  coord_cartesian(xlim= c(1998,2020), clip = "on")
+  coord_cartesian(xlim= c(2010,2020), clip = "on")
+ggloss
 
+scale_fill_brewer(palette = "Blues") +
+geom_line(aes(year, losssum), size = 1) +
 
 
 #### summary of of Bt observations in FS
@@ -314,8 +294,12 @@ ggplot(data=dat)+
 
 
 ggplot(data=prov)+
-  geom_line(aes(year, ysq_effect, color=provence)) + 
-  coord_cartesian(xlim= c(1998,2020), ylim = c(-.2,1), clip = "on")
+  geom_line(aes(year, ysq_effect, color=provence), size=1) + 
+  scale_color_brewer(palette = "Paired") +
+  coord_cartesian(xlim= c(1998,2020), ylim = c(-.2,.5), clip = "on")
+
+
+
 
 ggplot(data=FS)+
   geom_line(aes(year, ysq_effect))
@@ -358,52 +342,19 @@ coeftest(reg2, vcov = vcovHC(reg1, type="HC1"))
 reg1t <- summary(reg1, scale = TRUE)
 
 
-t1 <- tbl_regression(reg1, exponentiate = TRUE, )
+t1 <- tbl_regression(reg1, exponentiate = TRUE)
 t2 <- tbl_regression(reg2, exponentiate = TRUE, include = -c(year, yearsq))
 
 mergedt1 <- tbl_merge(tbls = list(t1, t2), tab_spanner = c("**Linear**", "**Quadratic**"))
 tbl_summary(mergedt1) %>% as_flex_table()
 
 
-#########################################
-## ATTEMPTS AT SE GRAPHS ##
-
-sumdata <- plyr::ddply(post, c("year", "provence"), summarise,
-               N    = length(yield),
-               mean = mean(yield),
-               sd   = sd(yield),
-               se   = sd / sqrt(N))
-sumdata
-postSE <- merge(post, sumdata, by=c("year","provence"))
-
-ggplot(postSE, aes(x=year, y=ysq_effect, group=provence, color=provence)) + 
-  geom_line() +
-  geom_point()+
-  geom_errorbar(aes(ymin=ysq_effect-se, ymax=ysq_effect+se), width=.2,
-                position=position_dodge(0.05)) +
-  facet_wrap(~provence)+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
-
-
-#shortened graph (by year)
-ggplot(data=post)+
-  #geom_line(aes(year, y_effect))+
-  geom_line(aes(year, ysq_effect, color=provence))
-
-
-#shortened graph + error bars
-
-FS$sd <- sd(FS$ysq_effect, na.rm = TRUE)
-ggplot(FS, aes(x=year, y=ysq_effect)) + 
-  geom_line() +
-  geom_errorbar(aes(ymin=ysq_effect-sd, ymax=ysq_effect+sd), width=.2,
-                position=position_dodge(0.05)) 
-
 ######################
 #graphs for presentation
 
 #box plot for yield by year, bt/non bt
+post <- prov[prov$year > "1999",]
+
 post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
 btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
   geom_boxplot(aes(color=bt), size = 1)
@@ -416,8 +367,22 @@ btgg2 <- btgg +
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time"
   ) +
-  scale_colour_brewer(type = "seq", palette = "Set2")
+  scale_colour_brewer(palette = "Paired")
 btgg2
+
+provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
+  geom_boxplot(aes(color=bt), size = 1, outlier.shape = NA) +
+  theme_bw() +
+  labs(
+    x = "Year",
+    y = "Yield",
+    colour = "Technology Type",
+    title = "Yield Differences Between Bt and Conventional Over Time") +
+  scale_colour_brewer(palette = "Paired")+
+  facet_wrap(~provence, scale="free")
+provboxplot
+
+
 
 #box plot for yield by year, yellow/white
 colgg <- ggplot(post, aes(year, yield, group= interaction(color, year))) + 
@@ -430,7 +395,7 @@ colgg2 <- colgg +
     colour = "Color",
     title = "Yield Differences Between Yellow and White Over Time"
   ) +
-  scale_colour_brewer(type = "seq", palette = "Set2")
+  scale_colour_brewer(palette = "Paired")
 colgg2
 
 

@@ -316,14 +316,14 @@ btsummarystat4 <- bandconv  %>%
 btsummarystat <- merge(btsummarystat, btsummarystat3, by = c("provence","technology"))
 names(btsummarystat)[names(btsummarystat) == "n"] <- "num_of_cultivars"
 names(btsummarystat4)[names(btsummarystat4) == "n"] <- "num_of_observations"
-btsummarystat <- merge(btsummarystat, btsummarystat4, by = "provence", "technology")
+btsummarystat <- merge(btsummarystat, btsummarystat4, by = c("provence","technology"))
 
 btsummarystat <- btsummarystat %>%
             gt(rowname_col = "province") %>%
   tab_header(
     title = "Characteristics of Provinces",
     subtitle = glue::glue("observations included in sample")
-  ) %>%
+  ) %>% group_by(technology) %>%
   cols_label(
     provence = html("Province"),
     yield = html("Average Yield"),
