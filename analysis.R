@@ -232,7 +232,7 @@ ggplot(data=totalloss)+
 
 maizeprod <- read.csv("data/metadata/maizeproduction.csv")
 
-names(maizeprod)[2:4] <- c("percentBt","1000ha", "totalmaizehectare")
+names(maizeprod)[2:6] <- c("percentBt","1000ha", "totalmaizehectare", "priceton", "totalmaizevalue")
 maizeprod$percentBt <- ifelse(is.na(maizeprod$percentBt), .29, maizeprod$percentBt)
 maizeprod$Bthectare <- maizeprod$percentBt*maizeprod$totalmaizehectare
 
@@ -243,7 +243,7 @@ totalloss <- merge(totalloss, maizeprod, by = c("year"), no.dups = TRUE)
 totalloss$mtloss <- (totalloss$gain_loss*totalloss$Bthectare)*-1
 totalloss$yearlyloss <- totalloss$mtloss*totalloss$priceton
 totalloss$losssum <- lag(totalloss$yearlyloss) + totalloss$yearlyloss
-totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "losssum")]
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "losssum", "totalmaizevalue")]
 
 write.csv(totalloss, "output/totalloss.csv")
 
@@ -262,8 +262,14 @@ ggloss <- ggplot(totalloss,aes(x = year, y = yearlyloss, fill = year))+
   coord_cartesian(xlim= c(2010,2020), clip = "on")
 ggloss
 
-scale_fill_brewer(palette = "Blues") +
-geom_line(aes(year, losssum), size = 1) +
+ggloss2 <- ggplot(totalloss)+
+  theme_bw() +
+  geom_bar(aes(x = year, y = totalmaizevalue), fill="#3CA9CA", width=.8, stat="identity") +
+  geom_bar(aes(x = year, y = yearlyloss), fill="#95427B", width=.8, stat="identity") +
+  scale_y_continuous(labels = scales::unit_format(unit = "M", scale = 1e-6)) +
+  labs(title = "Economic Loss") +
+  coord_cartesian(xlim= c(2010,2020), clip = "on")
+ggloss2
 
 
 #### summary of of Bt observations in FS
