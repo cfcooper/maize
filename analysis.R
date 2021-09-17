@@ -191,7 +191,28 @@ breakpoint2 <- merge(breakpoint, summaryb2, by = c("provence","year","color"), n
 breakpoint2 <- breakpoint2[,c("year", "provence", "color", "ysq_effect", "mean", "SD", "count")]
 breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 
-write.csv(breakpoint2, "output/peakbt.csv")
+
+proveffects <- breakpoint2 %>%
+  gt(rowname_col = "province") %>%
+  tab_header(
+    title = "Province Effects",
+    subtitle = glue::glue("observations included in sample")
+  ) %>%
+  cols_label(
+    year = html("Year"),
+    provence = html("Province"),
+    ysq_effect = html("Yield Gain Peak"),
+    mean = html("Average Yield"),
+    SD = html("Yield SD"),
+    count = html("num of observations")) %>%
+  cols_align(
+    align = "center",
+    columns = everything())  %>%
+  fmt_number(
+    columns = 4:6,
+    decimals = 3)
+
+print(proveffects)
 
 ##finding lost gains BY PROV
 gploss <- GP %>% filter(bt == 1) %>%
@@ -302,7 +323,8 @@ ggplot(data=dat)+
 ggplot(data=prov)+
   geom_line(aes(year, ysq_effect, color=provence), size=1) + 
   scale_color_brewer(palette = "Paired") +
-  coord_cartesian(xlim= c(1998,2020), ylim = c(-.2,.5), clip = "on")
+  labs(title = "Yield Gains Due to GM Technology") +
+  coord_cartesian(xlim= c(1998,2020), ylim = c(-.05,.5), clip = "on")
 
 
 
