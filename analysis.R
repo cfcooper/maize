@@ -20,7 +20,6 @@ dat %>%
 
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
-dat$bt <- ifelse(dat$technology %in% c("B", "BR"), 1, 0)
 
 pre <- dat[dat$year < 2011,]
 post <- dat[dat$year > "1999",]
@@ -157,34 +156,38 @@ northregion$ysq_effect <- north_reg$coefficients["GM"] + north_reg$coefficients[
 
 northregion$provence <- "northregion"
 prov <- rbind(northregion, GP, MP, KZN, LP, WC)
-#prov <- rbind(FS, GP, MP, NW, KZN, LP, NC, WC)
+prov2 <- rbind(EC, FS, GP, MP, NW, KZN, LP, NC, WC)
+prov2 <- prov2[!prov2$provence == "EC",]
+prov2 <- prov2[!prov2$provence == "LP",]
 
 ### yield gains peak
 
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-provence <- c("northregion", "GP", "MP", "KZN", "LP", "WC")
+provence <- c("FS","NW", "GP", "MP", "KZN", "LP", "WC")
 
-ysq_effect <- c(max(northregion$ysq_effect), 
+ysq_effect <- c(max(FS$ysq_effect),
+                max(NW$ysq_effect), 
                 max(GP$ysq_effect), 
                 max(MP$ysq_effect), 
                 max(KZN$ysq_effect), 
                 max(LP$ysq_effect), 
                 max(WC$ysq_effect))
 
+
 breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
-prov2 <- prov[,c("provence", "ysq_effect", "year")]
-breakpoint <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
+prov4 <- prov2[,c("provence", "ysq_effect", "year")]
+breakpoint <- merge(breakpoint, prov4, by = c("ysq_effect","provence"), no.dups = TRUE)
 breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
-summaryb <- prov %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
+summaryb <- prov2 %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
 breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
 
-summaryb2 <- prov %>% filter(bt == 1) %>%
+summaryb2 <- prov2 %>% filter(bt == 1) %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
 
@@ -215,7 +218,26 @@ proveffects <- breakpoint2 %>%
 
 print(proveffects)
 
+summtbl <- prov2 %>% filter(technology == "B") %>% 
+  group_by(provence, technology, year,  .add = FALSE) %>% 
+  summarise(yield = mean(yield, na.rm = T),
+            SD = sd(yield, na.rm = T))
+summtbl2 <- prov2 %>% filter(technology == "B") %>%
+  group_by(year, provence, technology) %>%
+  count()
+
+write.csv(summtbl2, "output/btobs.csv")
+
 ##finding lost gains BY PROV
+maizeprod <- read.csv("data/metadata/maizeproduction.csv")
+
+names(maizeprod)[2:7] <- c("percentBt","percentwhite", "percentyellow", "whiteprice", "yellowprice", "totalmaizeht")
+maizeprod$percentBt <- ifelse(is.na(maizeprod$percentBt), .29, maizeprod$percentBt)
+maizeprod$Bthectare <- maizeprod$percentBt*maizeprod$totalmaizeht
+maizeprod$totalprice <- maizeprod$percentwhite*maizeprod$whiteprice + maizeprod$percentyellow*maizeprod$yellowprice
+
+
+# GP Loss
 gploss <- GP %>% filter(bt == 1) %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
@@ -228,11 +250,95 @@ gploss <- gploss[!duplicated(gploss), ]
 gploss$maxysq <- ifelse(gploss$year<2010, NA, max(gploss$ysq_effect))
 gploss$gain_loss <- gploss$ysq_effect - gploss$maxysq
 
+gploss <- merge(gploss, maizeprod, by = c("year"), no.dups = TRUE)
 
-ggplot(data=gploss)+
-  geom_line(aes(year, ysq_effect)) + 
-  geom_line(aes(year, maxysq)) + 
-  coord_cartesian(xlim= c(1998,2020), ylim = c(.0,.5), clip = "on")
+gploss$mtloss <- (gploss$gain_loss*gploss$Bthectare)*-1
+gploss$yearlyloss <- gploss$mtloss*gploss$totalprice
+gploss$dollarlossperht <- gploss$yearlyloss/gploss$Bthectare
+gploss <- gploss[,c("year","provence", "color", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
+
+# KZN Loss
+kznloss <- KZN %>% filter(bt == 1) %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+kznloss <- merge(KZN, kznloss, by = c("provence","year","color"), no.dups = TRUE)
+kznloss <- kznloss[,c("year", "provence", "color","technology", "ysq_effect", "mean", "SD")]
+
+kznloss <- kznloss[kznloss$technology == "B",]
+kznloss <- kznloss[!duplicated(kznloss), ]
+kznloss$maxysq <- ifelse(kznloss$year<2012, NA, max(kznloss$ysq_effect))
+kznloss$gain_loss <- kznloss$ysq_effect - kznloss$maxysq
+
+kznloss <- merge(kznloss, maizeprod, by = c("year"), no.dups = TRUE)
+
+kznloss$mtloss <- (kznloss$gain_loss*kznloss$Bthectare)*-1
+kznloss$yearlyloss <- kznloss$mtloss*kznloss$totalprice
+kznloss$dollarlossperht <- kznloss$yearlyloss/kznloss$Bthectare
+kznloss <- kznloss[,c("year", "provence", "color", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
+
+# MP Loss
+mploss <- MP %>% filter(bt == 1) %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+mploss <- merge(MP, mploss, by = c("provence","year","color"), no.dups = TRUE)
+mploss <- mploss[,c("year", "provence", "color","technology", "ysq_effect", "mean", "SD")]
+
+mploss <- mploss[mploss$technology == "B",]
+mploss <- mploss[!duplicated(mploss), ]
+mploss$maxysq <- ifelse(mploss$year<2011, NA, max(mploss$ysq_effect))
+mploss$gain_loss <- mploss$ysq_effect - mploss$maxysq
+
+mploss <- merge(mploss, maizeprod, by = c("year"), no.dups = TRUE)
+
+mploss$mtloss <- (mploss$gain_loss*mploss$Bthectare)*-1
+mploss$yearlyloss <- mploss$mtloss*mploss$totalprice
+mploss$dollarlossperht <- mploss$yearlyloss/mploss$Bthectare
+mploss <- mploss[,c("year", "provence", "color", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
+
+# North Region Loss
+northloss <- northregion %>% filter(bt == 1) %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+northloss <- merge(northregion, northloss, by = c("provence","year","color"), no.dups = TRUE)
+northloss <- northloss[,c("year", "provence", "provence", "color","technology", "ysq_effect", "mean", "SD")]
+
+northloss <- northloss[northloss$technology == "B",]
+northloss <- northloss[!duplicated(northloss), ]
+northloss$maxysq <- ifelse(northloss$year<2011, NA, max(northloss$ysq_effect))
+northloss$gain_loss <- northloss$ysq_effect - northloss$maxysq
+
+northloss <- merge(northloss, maizeprod, by = c("year"), no.dups = TRUE)
+
+northloss$mtloss <- (northloss$gain_loss*northloss$Bthectare)*-1
+northloss$yearlyloss <- northloss$mtloss*northloss$totalprice
+northloss$dollarlossperht <- northloss$yearlyloss/northloss$Bthectare
+northloss <- northloss[,c("year", "provence", "color", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
+
+# WC Loss
+wcloss <- WC %>% filter(bt == 1) %>%
+  group_by(color, year, provence, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+wcloss <- merge(WC, wcloss, by = c("provence","year","color"), no.dups = TRUE)
+wcloss <- wcloss[,c("year", "provence", "color","technology", "ysq_effect", "mean", "SD")]
+
+wcloss <- wcloss[wcloss$technology == "B",]
+wcloss <- wcloss[!duplicated(wcloss), ]
+wcloss$maxysq <- ifelse(wcloss$year<2010, NA, max(wcloss$ysq_effect))
+wcloss$gain_loss <- wcloss$ysq_effect - wcloss$maxysq
+
+wcloss <- merge(wcloss, maizeprod, by = c("year"), no.dups = TRUE)
+
+wcloss$mtloss <- (wcloss$gain_loss*wcloss$Bthectare)*-1
+wcloss$yearlyloss <- wcloss$mtloss*wcloss$totalprice
+wcloss$dollarlossperht <- wcloss$yearlyloss/wcloss$Bthectare
+wcloss <- wcloss[,c("year", "provence", "color", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
+
+## Combining Prov Level Gains Lost
+provloss <- rbind(northloss, gploss, mploss, kznloss, wcloss)
 
 ##finding lost gains ALL
 allb <- dat[dat$technology == "B",]
@@ -252,28 +358,16 @@ ggplot(data=totalloss)+
   coord_cartesian(xlim= c(1998,2020), ylim = c(.0,.5), clip = "on")
 
 
-maizeprod <- read.csv("data/metadata/maizeproduction.csv")
 
-names(maizeprod)[2:6] <- c("percentBt","1000ha", "totalmaizehectare", "priceton", "totalmaizevalue")
-maizeprod$percentBt <- ifelse(is.na(maizeprod$percentBt), .29, maizeprod$percentBt)
-maizeprod$Bthectare <- maizeprod$percentBt*maizeprod$totalmaizehectare
 
 totalloss <- merge(totalloss, maizeprod, by = c("year"), no.dups = TRUE)
 
-##totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "Bthectare","priceton")]
-
 totalloss$mtloss <- (totalloss$gain_loss*totalloss$Bthectare)*-1
-totalloss$yearlyloss <- totalloss$mtloss*totalloss$priceton
-totalloss$losssum <- lag(totalloss$yearlyloss) + totalloss$yearlyloss
-totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "losssum", "totalmaizevalue")]
+totalloss$yearlyloss <- totalloss$mtloss*totalloss$totalprice
+totalloss$dollarlossperht <- totalloss$yearlyloss/totalloss$Bthectare
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
 
 write.csv(totalloss, "output/totalloss.csv")
-
-## Cleaned Tables
-
-cleanedloss <- totalloss[totalloss$year > 2010,]
-cleanedloss[is.na(cleanedloss)] <- 0  
-
 
 
 ggloss <- ggplot(totalloss,aes(x = year, y = yearlyloss, fill = year))+
@@ -316,12 +410,12 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
 
 
 ## peak graphs
-ggplot(data=dat)+
-  geom_line(aes(year, ysq_effect)) + 
-  coord_cartesian(xlim= c(1998,2020), ylim = c(-.05,.5), clip = "on")
+
+prov2 <- prov2[!prov2$provence == "EC",]
+prov2 <- prov2[!prov2$provence == "LP",]
 
 
-ggplot(data=prov)+
+ggplot(data=prov2)+
   geom_line(aes(year, ysq_effect, color=provence), size=1) + 
   scale_color_brewer(palette = "Paired") +
   labs(title = "Yield Gains Due to GM Technology") +
@@ -329,33 +423,6 @@ ggplot(data=prov)+
 
 
 
-
-ggplot(data=FS)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=GP)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=MP)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=NW)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=KZN)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=EC)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=LP)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=NC)+
-  geom_line(aes(year, ysq_effect))
-
-ggplot(data=WC)+
-  geom_line(aes(year, ysq_effect))
 
 ###################################
 # robustness test
@@ -426,21 +493,6 @@ colgg2 <- colgg +
   ) +
   scale_colour_brewer(palette = "Paired")
 colgg2
-
-
-
-######################
-
-#################################################################################
-
-# Breakpoint Analysis / Piecewise Linear Regression / Segmented Regression
-
-breakreg3 <- segmented.glm(reg3, seg.Z =~year)
-summary(breakreg2)
-
-breakfs <- segmented.glm(fs_reg, seg.Z =~ysq_effect)
-summary(breakfs)
-
 
 #################################################################################
 

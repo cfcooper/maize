@@ -293,12 +293,20 @@ btsummarystat4 <- bandconv  %>%
     group_by(technology, provence) %>%
       count()
 
+btsummarystat5 <- bandconv  %>%
+    group_by(technology, provence, locality) %>%
+      count()
+btlocal <- btsummarystat5  %>%
+    group_by(technology, provence) %>%
+      count()
+
 btsummarystat <- merge(btsummarystat, btsummarystat3, by = c("provence","technology"))
 names(btsummarystat)[names(btsummarystat) == "n"] <- "num_of_cultivars"
 names(btsummarystat4)[names(btsummarystat4) == "n"] <- "num_of_observations"
 btsummarystat <- merge(btsummarystat, btsummarystat4, by = c("provence","technology"))
+btsummarystat <- merge(btsummarystat, btlocal, by = c("provence","technology"))
+names(btsummarystat)[names(btsummarystat) == "n"] <- "num_of_localities"
 
-btsummarystat <- btsummarystat  %>% group_by(technology)
 btsummarystat <- btsummarystat %>%
             gt(rowname_col = "province") %>%
   tab_header(
@@ -311,17 +319,17 @@ btsummarystat <- btsummarystat %>%
     min = html("Min Year"),
     max = html("Max Year"),
     num_of_cultivars = html("num of cultivars"),
-    num_of_observations = html("num of observations")) %>%
+    num_of_observations = html("num of observations"),
+    num_of_localities= html("num of localities")) %>%
   cols_align(
     align = "center",
-    columns = everything())  %>%
-  fmt_number(
-    columns = yield,
-    decimals = 3)
-
-     
+    columns = everything())
   
 print(btsummarystat)
+
+
+
+
 
 
 
