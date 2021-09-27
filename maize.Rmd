@@ -270,13 +270,13 @@ write.csv(dat,"data/allyearsmerge.csv")
 #summ stats
 
 bandconv <- dat[dat$technology %in% c("B", "conv"),]
-
+bandconv <- bandconv[!bandconv$provence == "LP",]
 
 #bt summ stat
 
 btsummarystat <- bandconv %>%
   group_by(technology, provence, .add = FALSE) %>% 
-            summarise(yield = mean(yield, na.rm = T),
+            summarise(mean = mean(yield, na.rm = T),
                       SD = sd(yield, na.rm = T),
                       min = min(year, na.rm = T),
                       max = max(year, na.rm = T))
@@ -315,7 +315,7 @@ btsummarystat <- btsummarystat %>%
   ) %>%
   cols_label(
     provence = html("Province"),
-    yield = html("Average Yield"),
+    mean = html("Average Yield"),
     min = html("Min Year"),
     max = html("Max Year"),
     num_of_cultivars = html("num of cultivars"),

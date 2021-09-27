@@ -365,9 +365,14 @@ totalloss <- merge(totalloss, maizeprod, by = c("year"), no.dups = TRUE)
 totalloss$mtloss <- (totalloss$gain_loss*totalloss$Bthectare)*-1
 totalloss$yearlyloss <- totalloss$mtloss*totalloss$totalprice
 totalloss$dollarlossperht <- totalloss$yearlyloss/totalloss$Bthectare
-totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
+totalloss$kgloss <- totalloss$mtloss*1000
+totalloss$rationloss <- totalloss$kgloss/totalloss$consumption
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss","consumption","rationloss", "dollarlossperht")]
 
-write.csv(totalloss, "output/totalloss.csv")
+# Cleaned Total Loss
+#write.csv(totalloss, "output/totalloss.csv")
+
+totalloss <- totalloss[totalloss$year > 2010,]
 
 
 ggloss <- ggplot(totalloss,aes(x = year, y = yearlyloss, fill = year))+
