@@ -327,10 +327,20 @@ btsummarystat <- btsummarystat %>%
   
 print(btsummarystat)
 
+# Just B obs (no conv)
 
+bonlysummarystat <- bonly %>%
+  group_by(technology, provence, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T),
+                      SD = sd(yield, na.rm = T),
+                      min = min(year, na.rm = T),
+                      max = max(year, na.rm = T))
 
+bonlysummarystat2 <- bonly %>%
+    group_by(year, provence) %>%
+      count()
 
-
+breshape <- reshape(bonlysummarystat2, idvar = "year", v.names = "provence", timevar = "provence", direction = "wide")
 
 
 

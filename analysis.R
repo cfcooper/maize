@@ -155,7 +155,7 @@ northregion$y_effect <- north_reg$coefficients["GM"] + north_reg$coefficients["G
 northregion$ysq_effect <- north_reg$coefficients["GM"] + north_reg$coefficients["GM:year"] * northregion$year + north_reg$coefficients["GM:yearsq"] * northregion$yearsq
 
 northregion$provence <- "northregion"
-prov <- rbind(northregion, GP, MP, KZN, LP, WC)
+prov <- rbind(northregion, GP, MP, KZN, WC)
 prov2 <- rbind(EC, FS, GP, MP, NW, KZN, LP, NC, WC)
 prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
@@ -420,11 +420,10 @@ prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
 
 
-ggplot(data=prov2)+
+ggplot(data=prov)+
   geom_line(aes(year, ysq_effect, color=provence), size=1) + 
   scale_color_brewer(palette = "Paired") +
-  labs(title = "Yield Gains Due to GM Technology") +
-  coord_cartesian(xlim= c(1998,2020), ylim = c(-.05,.5), clip = "on")
+  coord_cartesian(xlim= c(1999,2020), ylim = c(-.05,.55), clip = "on")
 
 
 
