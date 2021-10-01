@@ -10,7 +10,8 @@ p_load(sandwich,
        Rcpp)
 install.packages("RColorBrewer")
 library(RColorBrewer)
-
+install.packages("maptools", repos="http://R-Forge.R-project.org")
+library(maptools)
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -57,6 +58,25 @@ max(dat$ysq_effect)
 
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
+
+reg2coeffs_std <- data.frame(summary(m1)$coefficients)
+coi_indices <- which(!startsWith(row.names(m1coeffs_std), 'idcode'))
+m1coeffs_std[coi_indices,]
+
+
+reg2coeffs_cl <- coeftest(reg2, vcov = vcovCL, cluster = ~provence)
+print(reg2coeffs_cl)
+
+
+## LEFT OFF HERE ** above
+
+
+
+
+
+
+
+
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
 summary(reg3)
 
@@ -406,6 +426,11 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
   summarise(count = n())
 
 ### predict economic loss
+
+
+### map provinces
+
+
 
 
 
