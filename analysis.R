@@ -5,9 +5,7 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 p_load(sandwich,
        lmtest,
-       gtsummary,
-       segmented,
-       Rcpp)
+       gtsummary)
 install.packages("RColorBrewer")
 library(RColorBrewer)
 install.packages("maptools", repos="http://R-Forge.R-project.org")
@@ -58,11 +56,6 @@ max(dat$ysq_effect)
 
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
-
-reg2coeffs_std <- data.frame(summary(m1)$coefficients)
-coi_indices <- which(!startsWith(row.names(m1coeffs_std), 'idcode'))
-m1coeffs_std[coi_indices,]
-
 
 reg2coeffs_cl <- coeftest(reg2, vcov = vcovCL, cluster = ~provence)
 print(reg2coeffs_cl)
@@ -431,6 +424,21 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
 ### map provinces
 
 
+file <-  readRDS("gadm36_ZAF_1_sp.rds")
+coordinates_cities <- read.csv("output/locationsummary.csv")
+coordinates_cities$count <- coordinates_cities$count/500
+
+summary(coordinates_cities)
+
+coordinates_cities <- arrange(coordinates_cities, desc(count))
+
+ggsa <- ggplot(file, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill = "white") +
+  geom_path(color = "black") +
+  coord_equal() +
+  geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "darkseagreen", 
+             size= coordinates_cities$count, inherit.aes = FALSE)
+ggsa
 
 
 
