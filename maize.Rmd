@@ -355,10 +355,10 @@ genetics2 <- dat[dat$cultivar_name == "DKC78-15B",]
 genetics <- bind_rows(genetics,genetics2)
 genetics <- genetics[,c("year", "provence", "locality", "cultivar_name", "yield", "color", "technology", "Bt")]
 
-summarygen <- genetics %>% 
-  group_by(year, cultivar_name, .add = FALSE) %>% 
-            summarise(mean = mean(yield, na.rm = T), 
-            SD = sd(yield, na.rm = T))
+summarygen <- dat %>% 
+  group_by(cultivar_name, technology, release_year, .add = FALSE) %>% 
+            count()
+write.csv(summarygen, "output/releaseyear.csv")
 
 p <- ggplot(data = summarygen, aes(x = year, y = mean)) + geom_smooth(aes(color=cultivar_name))
 
