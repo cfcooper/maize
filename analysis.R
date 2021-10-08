@@ -13,6 +13,8 @@ library(maptools)
 
 dat <- readRDS("data/finalpanel.rds")
 
+#test test test
+
 dat %>%
   group_by(year) %>%
   summarise(mean = mean(yield, na.rm=T))
