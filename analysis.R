@@ -22,10 +22,11 @@ dat %>%
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
-pre <- dat[dat$year < 2011,]
-post <- dat[dat$year > "1999",]
-allb <- dat[dat$bt == 1,]
-bonly <- dat[dat$technology == "B",]
+bandconv <- dat[dat$technology %in% c("B", "conv"),]
+bandconv <- bandconv[!bandconv$provence == "LP",]
+
+dat <- bandconv
+
 
 summarynew <- dat %>% group_by(provence,color, technology, year, .add = FALSE) %>% 
   summarise(mean = mean(yield, na.rm = T), 
@@ -46,7 +47,8 @@ summary(reg1)
 
 dat$yearsq <- dat$year*dat$year
 
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
+#reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
+reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + color*GM + irrigated, data=dat)
 summary(reg2)
 
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
@@ -179,14 +181,13 @@ prov2 <- prov2[!prov2$provence == "LP",]
 
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-provence <- c("FS","NW", "GP", "MP", "KZN", "LP", "WC")
+provence <- c("FS","NW", "GP", "MP", "KZN", "WC")
 
 ysq_effect <- c(max(FS$ysq_effect),
                 max(NW$ysq_effect), 
                 max(GP$ysq_effect), 
                 max(MP$ysq_effect), 
                 max(KZN$ysq_effect), 
-                max(LP$ysq_effect), 
                 max(WC$ysq_effect))
 
 

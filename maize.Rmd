@@ -325,7 +325,7 @@ btsummarystat <- btsummarystat %>%
     align = "center",
     columns = everything())
   
-print(btsummarystat)
+write.csv(btsummarystat,"btsummarystat.csv")
 
 # Just B obs (no conv)
 
