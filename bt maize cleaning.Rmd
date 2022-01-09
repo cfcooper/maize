@@ -274,9 +274,9 @@ write.csv(dat,"data/allyearsmerge.csv")
 bandconv <- dat[dat$technology %in% c("B", "conv"),]
 bandconv <- bandconv[!bandconv$provence == "LP",]
 
-#bt summ stat
-
-btsummarystat <- bandconv %>%
+#yellow bt summ stat
+ybtsummarystat <- bandconv[!bandconv$provence == "white",]
+ybtsummarystat <- bandconv %>%
   group_by(technology, provence, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T),
                       SD = sd(yield, na.rm = T),
@@ -302,17 +302,18 @@ btlocal <- btsummarystat5  %>%
     group_by(technology, provence) %>%
       count()
 
-btsummarystat <- merge(btsummarystat, btsummarystat3, by = c("provence","technology"))
-names(btsummarystat)[names(btsummarystat) == "n"] <- "num_of_cultivars"
+ybtsummarystat <- merge(ybtsummarystat, btsummarystat3, by = c("provence","technology"))
+names(ybtsummarystat)[names(ybtsummarystat) == "n"] <- "num_of_cultivars"
 names(btsummarystat4)[names(btsummarystat4) == "n"] <- "num_of_observations"
-btsummarystat <- merge(btsummarystat, btsummarystat4, by = c("provence","technology"))
-btsummarystat <- merge(btsummarystat, btlocal, by = c("provence","technology"))
-names(btsummarystat)[names(btsummarystat) == "n"] <- "num_of_localities"
+ybtsummarystat <- merge(ybtsummarystat, btsummarystat4, by = c("provence","technology"))
+ybtsummarystat <- merge(ybtsummarystat, btlocal, by = c("provence","technology"))
+names(ybtsummarystat)[names(ybtsummarystat) == "n"] <- "num_of_localities"
 
-btsummarystat <- btsummarystat %>%
+
+ybtsummarystat <- ybtsummarystat %>%
             gt(rowname_col = "province") %>%
   tab_header(
-    title = "Characteristics of Provinces",
+    title = "Characteristics of Provinces- Yellow",
     subtitle = glue::glue("observations included in sample")
   ) %>%
   cols_label(
@@ -327,7 +328,64 @@ btsummarystat <- btsummarystat %>%
     align = "center",
     columns = everything())
   
-write.csv(btsummarystat,"btsummarystat.csv")
+write.csv(ybtsummarystat,"ybtsummarystat.csv")
+
+#white bt summ stat
+wbtsummarystat <- bandconv[!bandconv$provence == "yellow",]
+wbtsummarystat <- bandconv %>%
+  group_by(technology, provence, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T),
+                      SD = sd(yield, na.rm = T),
+                      min = min(year, na.rm = T),
+                      max = max(year, na.rm = T))
+
+btsummarystat2 <- bandconv %>%
+    group_by(technology, provence, cultivar_name) %>%
+      count()
+
+btsummarystat3 <- btsummarystat2 %>%
+    group_by(technology,provence) %>%
+      count()
+
+btsummarystat4 <- bandconv  %>%
+    group_by(technology, provence) %>%
+      count()
+
+btsummarystat5 <- bandconv  %>%
+    group_by(technology, provence, locality) %>%
+      count()
+btlocal <- btsummarystat5  %>%
+    group_by(technology, provence) %>%
+      count()
+
+wbtsummarystat <- merge(wbtsummarystat, btsummarystat3, by = c("provence","technology"))
+names(wbtsummarystat)[names(wbtsummarystat) == "n"] <- "num_of_cultivars"
+names(btsummarystat4)[names(btsummarystat4) == "n"] <- "num_of_observations"
+wbtsummarystat <- merge(wbtsummarystat, btsummarystat4, by = c("provence","technology"))
+wbtsummarystat <- merge(wbtsummarystat, btlocal, by = c("provence","technology"))
+names(wbtsummarystat)[names(wbtsummarystat) == "n"] <- "num_of_localities"
+
+
+wbtsummarystat <- wbtsummarystat %>%
+            gt(rowname_col = "province") %>%
+  tab_header(
+    title = "Characteristics of Provinces- White",
+    subtitle = glue::glue("observations included in sample")
+  ) %>%
+  cols_label(
+    provence = html("Province"),
+    mean = html("Average Yield"),
+    min = html("Min Year"),
+    max = html("Max Year"),
+    num_of_cultivars = html("num of cultivars"),
+    num_of_observations = html("num of observations"),
+    num_of_localities= html("num of localities")) %>%
+  cols_align(
+    align = "center",
+    columns = everything())
+  
+write.csv(wbtsummarystat,"wbtsummarystat.csv")
+
 
 # Just B obs (no conv)
 
