@@ -212,7 +212,7 @@ names(dat)[names(dat) == 'count'] <- 'cult_nvals'
 dat$cult_nvals <- if_else(dat$cult_nvals %in% c(NA), "0", "1")
 dat <- dat[!dat$cult_nvals== "1", ]
 
-# check cultivar if in more than one obersvation per provence/year
+# check cultivar if in more than one observation per provence/year
 summarycult <- dat %>% group_by(year, provence, cultivar_name) %>%
                 summarise(count = n()) 
 summarycult <- summarycult[summarycult$count== "1",]

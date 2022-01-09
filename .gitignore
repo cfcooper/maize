@@ -2,10 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
-
 *.csv
 *.rds
-
 data/
 output/
 test-figure/
+.DS_Store

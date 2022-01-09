@@ -27,6 +27,87 @@ dat <- readRDS("data/finalpanel.rds")
 
 ```
 
+### Generate Alternate Models
+```{r data, include=FALSE}
+#cult has more than 10 obs per year
+altpanel1 <- dat
+summarycult <- altpanel1 %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
+summarycult <- summarycult[summarycult$count < 10,]
+
+altpanel1 <- merge(altpanel1,summarycult, by = c("year","cultivar_name"),all = TRUE, no.dups= TRUE)
+names(altpanel1)[names(altpanel1) == 'count'] <- 'cult_nvals'
+altpanel1$cult_nvals <- if_else(altpanel1$cult_nvals %in% c(NA), "0", "1")
+altpanel1 <- altpanel1[!altpanel1$cult_nvals== "1", ]
+
+altpanel1 <- altpanel1[,c("year", "cultivar_name", "provence", "locality", 
+              "rep", "yield", "color", "technology", "crop",
+              "irrigated", "release_year", "bt")]
+
+#cult in more than 3 years
+altpanel2 <- dat
+summarycult <- altpanel2 %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
+summarycult2 <- summarycult %>% group_by(cultivar_name) %>% summarise(count = n())
+summarycult2 <- summarycult2[summarycult2$count < 3,]
+
+altpanel2 <- merge(altpanel2,summarycult2, by = c("cultivar_name"),all = TRUE, no.dups= TRUE)
+names(altpanel2)[names(altpanel2) == 'count'] <- 'cult_nvals'
+altpanel2$cult_nvals <- if_else(altpanel2$cult_nvals %in% c(NA), "0", "1")
+altpanel2 <- altpanel2[!altpanel2$cult_nvals== "1", ]
+
+altpanel2 <- altpanel2[,c("year", "cultivar_name", "provence", "locality", 
+              "rep", "yield", "color", "technology", "crop",
+              "irrigated", "release_year", "bt")]
+
+#cult in more than 5 years
+altpanel3 <- dat
+summarycult <- altpanel3 %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
+summarycult2 <- summarycult %>% group_by(cultivar_name) %>% summarise(count = n())
+summarycult2 <- summarycult2[summarycult2$count < 5,]
+
+altpanel3 <- merge(altpanel3,summarycult2, by = c("cultivar_name"),all = TRUE, no.dups= TRUE)
+names(altpanel3)[names(altpanel3) == 'count'] <- 'cult_nvals'
+altpanel3$cult_nvals <- if_else(altpanel3$cult_nvals %in% c(NA), "0", "1")
+altpanel3 <- altpanel3[!altpanel3$cult_nvals== "1", ]
+
+altpanel3 <- altpanel3[,c("year", "cultivar_name", "provence", "locality", 
+              "rep", "yield", "color", "technology", "crop",
+              "irrigated", "release_year", "bt")]
+
+#cult has 10 obs per year in more than 3 years
+altpanel4 <- altpanel1
+summarycult <- altpanel4 %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
+summarycult2 <- summarycult %>% group_by(cultivar_name) %>% summarise(count = n())
+summarycult2 <- summarycult2[summarycult2$count < 3,]
+
+altpanel4 <- merge(altpanel4,summarycult2, by = c("cultivar_name"),all = TRUE, no.dups= TRUE)
+names(altpanel4)[names(altpanel4) == 'count'] <- 'cult_nvals'
+altpanel4$cult_nvals <- if_else(altpanel4$cult_nvals %in% c(NA), "0", "1")
+altpanel4 <- altpanel4[!altpanel4$cult_nvals== "1", ]
+
+altpanel4 <- altpanel4[,c("year", "cultivar_name", "provence", "locality", 
+              "rep", "yield", "color", "technology", "crop",
+              "irrigated", "release_year", "bt")]
+
+
+#locality in at least than 5 years
+altpanel5 <- dat
+summaryloc <- altpanel5 %>% group_by(year, locality) %>% 
+  summarise(count = n()) # check location if in more than one year
+summaryloc <- summaryloc %>% group_by(locality) %>% 
+  summarise (count = n())
+summaryloc <- summaryloc[summaryloc$count < 5,]
+altpanel5 <- merge(altpanel5,summaryloc, by = c("locality"),all = TRUE, no.dups= TRUE)
+names(altpanel5)[names(altpanel5) == 'count'] <- 'loc_nvals'
+altpanel5$loc_nvals <- if_else(altpanel5$loc_nvals %in% c(NA), "0", "1")
+altpanel5 <- altpanel5[!altpanel5$loc_nvals== "1", ]
+
+altpanel5 <- altpanel5[,c("year", "cultivar_name", "provence", "locality", 
+              "rep", "yield", "color", "technology", "crop",
+              "irrigated", "release_year", "bt")]
+
+rm(summarycult, summarycult2, summaryloc)
+```
+
 ### Regressions
 ```{r data, include=FALSE}
 dat %>%
@@ -51,9 +132,10 @@ p + geom_smooth(aes(color=color), size = 1) +
   facet_wrap(~provence)
 
 
-pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
-sum_prereg <- summary(pre_reg)
-sum_prereg
+
+#pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
+#sum_prereg <- summary(pre_reg)
+#sum_prereg
 
 reg1 <- glm(yield ~ provence + factor(year) + GM + color + irrigated, data=dat)
 summary(reg1)
@@ -153,10 +235,10 @@ summary(ec_reg)
 EC$y_effect <- ec_reg$coefficients["GM"] + ec_reg$coefficients["GM:year"] * EC$year
 EC$ysq_effect <- ec_reg$coefficients["GM"] + ec_reg$coefficients["GM:year"] * EC$year + ec_reg$coefficients["GM:yearsq"] * EC$yearsq
 
-#7
-LP <- dat[dat$provence == "LP",]
-lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=LP)
-summary(lp_reg)
+#7 ##REMOVED LP FROM DATA#
+#LP <- dat[dat$provence == "LP",]
+#lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=LP)
+#summary(lp_reg)
 
 LP$y_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year
 LP$ysq_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year + lp_reg$coefficients["GM:yearsq"] * LP$yearsq
@@ -187,7 +269,7 @@ northregion$ysq_effect <- north_reg$coefficients["GM"] + north_reg$coefficients[
 
 northregion$provence <- "northregion"
 prov <- rbind(northregion, GP, MP, KZN, WC)
-prov2 <- rbind(EC, FS, GP, MP, NW, KZN, LP, NC, WC)
+prov2 <- rbind(EC, FS, GP, MP, NW, KZN, NC, WC)
 prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
 
