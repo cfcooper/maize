@@ -275,15 +275,10 @@ bandconv <- dat[dat$technology %in% c("B", "conv"),]
 bandconv <- bandconv[!bandconv$provence == "LP",]
 
 #yellow bt summ stat
-ybtsummarystat <- bandconv[!bandconv$provence == "white",]
-ybtsummarystat <- bandconv %>%
-  group_by(technology, provence, .add = FALSE) %>% 
-            summarise(mean = mean(yield, na.rm = T),
-                      SD = sd(yield, na.rm = T),
-                      min = min(year, na.rm = T),
-                      max = max(year, na.rm = T))
 
-btsummarystat2 <- bandconv %>%
+ybtsummarystat <- bandconv[!bandconv$color == "white",]
+
+btsummarystat2 <- ybtsummarystat %>%
     group_by(technology, provence, cultivar_name) %>%
       count()
 
@@ -291,16 +286,23 @@ btsummarystat3 <- btsummarystat2 %>%
     group_by(technology,provence) %>%
       count()
 
-btsummarystat4 <- bandconv  %>%
+btsummarystat4 <- ybtsummarystat  %>%
     group_by(technology, provence) %>%
       count()
 
-btsummarystat5 <- bandconv  %>%
+btsummarystat5 <- ybtsummarystat  %>%
     group_by(technology, provence, locality) %>%
       count()
 btlocal <- btsummarystat5  %>%
     group_by(technology, provence) %>%
       count()
+
+ybtsummarystat <- ybtsummarystat %>%
+  group_by(technology, provence, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T),
+                      SD = sd(yield, na.rm = T),
+                      min = min(year, na.rm = T),
+                      max = max(year, na.rm = T))
 
 ybtsummarystat <- merge(ybtsummarystat, btsummarystat3, by = c("provence","technology"))
 names(ybtsummarystat)[names(ybtsummarystat) == "n"] <- "num_of_cultivars"
@@ -331,15 +333,10 @@ ybtsummarystat <- ybtsummarystat %>%
 write.csv(ybtsummarystat,"ybtsummarystat.csv")
 
 #white bt summ stat
-wbtsummarystat <- bandconv[!bandconv$provence == "yellow",]
-wbtsummarystat <- bandconv %>%
-  group_by(technology, provence, .add = FALSE) %>% 
-            summarise(mean = mean(yield, na.rm = T),
-                      SD = sd(yield, na.rm = T),
-                      min = min(year, na.rm = T),
-                      max = max(year, na.rm = T))
+wbtsummarystat <- bandconv[!bandconv$color == "yellow",]
 
-btsummarystat2 <- bandconv %>%
+
+btsummarystat2 <- wbtsummarystat %>%
     group_by(technology, provence, cultivar_name) %>%
       count()
 
@@ -347,16 +344,23 @@ btsummarystat3 <- btsummarystat2 %>%
     group_by(technology,provence) %>%
       count()
 
-btsummarystat4 <- bandconv  %>%
+btsummarystat4 <- wbtsummarystat  %>%
     group_by(technology, provence) %>%
       count()
 
-btsummarystat5 <- bandconv  %>%
+btsummarystat5 <- wbtsummarystat  %>%
     group_by(technology, provence, locality) %>%
       count()
 btlocal <- btsummarystat5  %>%
     group_by(technology, provence) %>%
       count()
+
+wbtsummarystat <- wbtsummarystat %>%
+  group_by(technology, provence, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T),
+                      SD = sd(yield, na.rm = T),
+                      min = min(year, na.rm = T),
+                      max = max(year, na.rm = T))
 
 wbtsummarystat <- merge(wbtsummarystat, btsummarystat3, by = c("provence","technology"))
 names(wbtsummarystat)[names(wbtsummarystat) == "n"] <- "num_of_cultivars"
