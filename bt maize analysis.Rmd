@@ -147,6 +147,12 @@ dat$yearsq <- dat$year*dat$year
 reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + color*GM + irrigated, data=dat)
 summary(reg2)
 
+
+dat$y_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year
+dat$ysq_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
+max(dat$ysq_effect2)
+
+
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
 dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 
@@ -587,7 +593,7 @@ tbl_summary(mergedt1) %>% as_flex_table()
 #graphs for presentation
 
 #box plot for yield by year, bt/non bt
-post <- prov[prov$year > "1999",]
+post <- bandconv[bandconv$year > "1999",]
 
 post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
 btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
@@ -602,7 +608,7 @@ btgg2 <- btgg +
     title = "Yield Differences Between Bt and Conventional Over Time"
   ) +
   scale_colour_brewer(palette = "Paired")
-btgg2
+print(btgg2)
 
 provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
   geom_boxplot(aes(color=bt), size = 1, outlier.shape = NA) +
@@ -614,7 +620,7 @@ provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) +
     title = "Yield Differences Between Bt and Conventional Over Time") +
   scale_colour_brewer(palette = "Paired")+
   facet_wrap(~provence, scale="free")
-provboxplot
+print(provboxplot)
 
 
 
