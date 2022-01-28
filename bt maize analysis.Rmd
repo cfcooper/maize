@@ -144,11 +144,11 @@ summary(reg1)
 dat$yearsq <- dat$year*dat$year
 
 #reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + color*GM + irrigated, data=dat)
+reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM*color + yearsq*GM*color + color + irrigated, data=dat)
 summary(reg2)
 
 
-dat$y_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year
+dat$y_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["color:GM"]*dat$year + reg2$coefficients["GM:year"] * dat$year
 dat$ysq_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
 max(dat$ysq_effect2)
 
