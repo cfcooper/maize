@@ -489,7 +489,7 @@ tbl_summary(mergedt1) %>% as_flex_table()
 #graphs for presentation
 
 #box plot for yield by year, bt/non bt
-post <- prov[prov$year > "1999",]
+post <- dat[dat$year > "1999",]
 
 post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
 btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
@@ -503,18 +503,18 @@ btgg2 <- btgg +
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time"
   ) +
-  scale_colour_brewer(palette = "Paired")
+  scale_colour_brewer(palette = "Dark2")
 btgg2
 
 provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
-  geom_boxplot(aes(color=bt), size = 1, outlier.shape = NA) +
+  geom_boxplot(aes(color=bt), size = .5, outlier.shape = NA) +
   theme_bw() +
   labs(
     x = "Year",
     y = "Yield",
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time") +
-  scale_colour_brewer(palette = "Paired")+
+  scale_colour_brewer(palette = "Dark2")+
   facet_wrap(~provence, scale="free")
 provboxplot
 
@@ -531,7 +531,7 @@ colgg2 <- colgg +
     colour = "Color",
     title = "Yield Differences Between Yellow and White Over Time"
   ) +
-  scale_colour_brewer(palette = "Paired")
+  scale_colour_brewer(palette = "Dark2")
 colgg2
 
 #################################################################################

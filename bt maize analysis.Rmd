@@ -18,10 +18,15 @@ library(pacman)
 p_load(sandwich,
        lmtest,
        gtsummary)
-install.packages("RColorBrewer")
+install.packages("RColorBrewer","kableExtra", "gt")
+install.packages('modelsummary')
 library(RColorBrewer)
 install.packages("maptools", repos="http://R-Forge.R-project.org")
 library(maptools)
+library(modelsummary)
+library(kableExtra)
+library(gt)
+
 
 dat <- readRDS("data/finalpanel.rds")
 
@@ -117,6 +122,15 @@ dat %>%
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
+## require 5 obs per year per provence
+summaryobs <- dat %>% group_by(year, provence, color, bt) %>%
+  summarise(count = n()) # check bt if in more than one obersvation per provence/year
+summaryobs <- summaryobs[summaryobs$count < 5,]
+summaryobs$count <- "1"
+dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE, no.dups= TRUE)
+dat$count <- if_else(dat$count %in% c(NA), "0", "1")
+dat <- dat[!dat$count== "1", ]
+
 bandconv <- dat[dat$technology %in% c("B", "conv"),]
 bandconv <- bandconv[!bandconv$provence == "LP",]
 
@@ -161,32 +175,16 @@ max(dat$ysq_effect)
 
 
 # Provence by year by GM effects in one model
-## Need to add robust standard errors using jtools, sandwich, and lmtest packages
-
-reg2coeffs_cl <- coeftest(reg2, vcov = vcovCL, cluster = ~provence)
-print(reg2coeffs_cl)
-
 
 ## LEFT OFF HERE ** above
-
-
-
-
-
-
-
-
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
 summary(reg3)
 
-## require 5 obs per year per provence
-summaryobs <- dat %>% group_by(year, provence, color, bt) %>%
-  summarise(count = n()) # check bt if in more than one obersvation per provence/year
-summaryobs <- summaryobs[summaryobs$count < 5,]
-summaryobs$count <- "1"
-dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE, no.dups= TRUE)
-dat$count <- if_else(dat$count %in% c(NA), "0", "1")
-dat <- dat[!dat$count== "1", ]
+models <- list(reg1,reg2,reg3)
+
+
+modelregress <- modelsummary(models, vcov = vcovHC, stars = TRUE)
+print(modelregress)
 
 
 
