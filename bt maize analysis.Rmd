@@ -183,7 +183,7 @@ summary(reg3)
 models <- list(reg1,reg2,reg3)
 
 
-modelregress <- modelsummary(models, vcov = vcovHC, stars = TRUE)
+modelregress <- modelsummary(models,output = "modelregress.png", vcov = vcovHC, stars = TRUE)
 print(modelregress)
 
 
