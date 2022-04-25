@@ -226,10 +226,8 @@ dat <- dat[,c("year", "region", "provence", "locality", "locality_no",
               "irrigated","land_type", "number", "release_year")]
 
 
-summaryloc <- dat %>% group_by(year, locality) %>% 
-  summarise(count = n()) # check location if in more than one year
-summaryloc <- summaryloc %>% group_by(locality) %>% 
-  summarise (count = n()) # trials per location
+summaryloc <- dat %>% group_by(year, locality) %>% summarise(count = n()) # check location if in more than one year
+summaryloc <- summaryloc %>% group_by(locality) %>% summarise (count = n()) # trials per location
 
 dat <- merge(dat,summaryloc,by= "locality")
 names(dat)[names(dat) == 'count'] <- 'nval'
@@ -392,6 +390,7 @@ write.csv(wbtsummarystat,"wbtsummarystat.csv")
 
 
 # Just B obs (no conv)
+bonly <- dat[(dat$technology == "B"),]
 
 bonlysummarystat <- bonly %>%
   group_by(technology, provence, .add = FALSE) %>% 
@@ -406,7 +405,8 @@ bonlysummarystat2 <- bonly %>%
 
 breshape <- reshape(bonlysummarystat2, idvar = "year", v.names = "provence", timevar = "provence", direction = "wide")
 
-
+saveRDS(dat, "data/finalpanel.rds")
+dat <- readRDS("data/finalpanel.rds")
 
 ```
 

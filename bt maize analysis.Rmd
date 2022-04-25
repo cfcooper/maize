@@ -14,8 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls()) # Caution: this clears the Environment
 
 if (!require("pacman")) install.packages("pacman")
+install.packages('gtsummary')
 library(pacman)
-p_load(sandwich,
+library(sandwich,
        lmtest,
        gtsummary)
 install.packages("RColorBrewer","kableExtra", "gt")
@@ -122,9 +123,9 @@ dat %>%
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
-## require 5 obs per year per provence
+## require 5 obs per year per province
 summaryobs <- dat %>% group_by(year, provence, color, bt) %>%
-  summarise(count = n()) # check bt if in more than one obersvation per provence/year
+  summarise(count = n()) # check bt if in more than one observation per province/year
 summaryobs <- summaryobs[summaryobs$count < 5,]
 summaryobs$count <- "1"
 dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE, no.dups= TRUE)
@@ -157,14 +158,14 @@ summary(reg1)
 
 dat$yearsq <- dat$year*dat$year
 
-#reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM*color + yearsq*GM*color + color + irrigated, data=dat)
+reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
+#reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM*color + yearsq*GM*color + color + irrigated, data=dat)
 summary(reg2)
 
 
-dat$y_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["color:GM"]*dat$year + reg2$coefficients["GM:year"] * dat$year
-dat$ysq_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
-max(dat$ysq_effect2)
+#dat$y_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["color:GM"]*dat$year + reg2$coefficients["GM:year"] * dat$year
+#dat$ysq_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
+#max(dat$ysq_effect2)
 
 
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
@@ -182,7 +183,9 @@ summary(reg3)
 
 models <- list(reg1,reg2,reg3)
 
-
+install.packages("magick")
+install.packages("webshot")
+webshot::install_phantomjs()
 modelregress <- modelsummary(models,output = "modelregress.png", vcov = vcovHC, stars = TRUE)
 print(modelregress)
 
