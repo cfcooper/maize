@@ -185,11 +185,24 @@ models <- list(reg1,reg2,reg3)
 
 install.packages("magick")
 install.packages("webshot")
-webshot::install_phantomjs()
+
 modelregress <- modelsummary(models,output = "modelregress.png", vcov = vcovHC, stars = TRUE)
 print(modelregress)
-
-
+reduced <- c('(Intercept)' = 'Constant',
+             'provenceFS' = "Free State",
+             'provenceGP' = "GP",
+             'provenceKZN' = "KZN",
+             'provenceMP' = "MP",
+             'provenceNC' = "NC",
+             'provenceNW' = "NW",
+             'provenceWS' = "WS",
+             'GM' = "GM",
+             'coloryellow' = "Color (yellow)",
+             'irrigated' = "Irrigated",
+             'GM x year' = "GM x year",
+             'GM x yearsq' = "GM x yearsq"
+             )
+msummary(models, coef_map = reduced)
 
 
 #1

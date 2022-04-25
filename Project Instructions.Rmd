@@ -23,7 +23,7 @@ renv::init()
 install.packages("pacman")
 
 p_load(ggplot2, tidyr, dplyr)
-
+library(pacman)
 install.packages("gt")
 install.packages("RColorBrewer")
 install.packages("kableExtra")
