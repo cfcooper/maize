@@ -1,0 +1,54 @@
+---
+title: "Project Instructions"
+author: "Courtney Cooper"
+date: "4/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Order of Files-
+
+1. bt maize cleaning.rmd (reading in raw data files and cleaning to produce rmd file)
+2. bt maize analysis.rmd (analysis/regressions run from rmd file)
+3. whiteanalysis.r (analysis done of just white maize)
+
+packages needed:
+
+```{r packages}
+library(renv)
+renv::init()
+
+install.packages("pacman")
+
+p_load(ggplot2, tidyr, dplyr)
+
+install.packages("gt")
+install.packages("RColorBrewer")
+install.packages("kableExtra")
+install.packages("modelsummary")
+library(gt)
+library(ggplot2,
+        dplyr,
+        tidyr,
+        gt,
+        sandwich,
+        lmtest,
+        gtsummary,
+        kableExtra)
+library(modelsummary)
+library(RColorBrewer)
+library(modelsummary)
+
+
+
+
+install.packages("maptools", repos="http://R-Forge.R-project.org")
+library(maptools)
+
+
+
+
+```
+

@@ -493,3 +493,7 @@ summaryloccult <- summaryloccult %>% group_by(cultivar_name) %>% summarise (coun
 
 write_rds(dat, "data/finalpanel.rds")
 dat <- readRDS("data/finalpanel.rds")
+
+```
+
+
