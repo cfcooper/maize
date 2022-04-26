@@ -17,8 +17,7 @@ Order of Files-
 packages needed:
 
 ```{r packages}
-library(renv)
-renv::init()
+
 
 install.packages("pacman")
 
