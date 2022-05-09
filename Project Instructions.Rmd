@@ -20,19 +20,18 @@ packages needed:
 
 
 install.packages("pacman")
+library(pacman)
 
 p_load(ggplot2, tidyr, dplyr)
-library(pacman)
+
 install.packages("gt")
 install.packages("RColorBrewer")
 install.packages("kableExtra")
 install.packages("modelsummary")
+install.packages("gtsummary")
+
 library(gt)
-library(ggplot2,
-        dplyr,
-        tidyr,
-        gt,
-        sandwich,
+library(sandwich,
         lmtest,
         gtsummary,
         kableExtra)
