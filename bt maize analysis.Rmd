@@ -146,12 +146,6 @@ p <- ggplot(summarynew, aes(year, mean))
 p + geom_smooth(aes(color=color), size = 1) +
   facet_wrap(~provence)
 
-
-
-#pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
-#sum_prereg <- summary(pre_reg)
-#sum_prereg
-
 reg1 <- glm(yield ~ provence + factor(year) + GM + color + irrigated, data=dat)
 summary(reg1)
 
@@ -159,13 +153,7 @@ summary(reg1)
 dat$yearsq <- dat$year*dat$year
 
 reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
-#reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM*color + yearsq*GM*color + color + irrigated, data=dat)
 summary(reg2)
-
-
-#dat$y_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["color:GM"]*dat$year + reg2$coefficients["GM:year"] * dat$year
-#dat$ysq_effect2 <- reg2$coefficients["GM"] + reg2$coefficients["coloryellow"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
-#max(dat$ysq_effect2)
 
 
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
@@ -185,9 +173,6 @@ models <- list(reg1,reg2,reg3)
 
 install.packages("magick")
 install.packages("webshot")
-
-modelregress <- modelsummary(models,output = "modelregress.png", vcov = vcovHC, stars = TRUE)
-print(modelregress)
 reduced <- c('(Intercept)' = 'Constant',
              'provenceFS' = "Free State",
              'provenceGP' = "GP",
@@ -202,8 +187,15 @@ reduced <- c('(Intercept)' = 'Constant',
              'GM x year' = "GM x year",
              'GM x yearsq' = "GM x yearsq"
              )
+modelregress <- msummary(models,coef_map = reduced, vcov = vcovHC, stars = TRUE)
+print(modelregress)
+
 msummary(models, coef_map = reduced)
 
+dat <- readRDS("data/finalpanel.rds")
+dat$GM <- 0
+dat$GM <- ifelse(dat$technology != "conv", 1, 0)
+dat$yearsq <- dat$year*dat$year
 
 #1
 FS <- dat[dat$provence == "FS",]
@@ -260,8 +252,8 @@ EC$ysq_effect <- ec_reg$coefficients["GM"] + ec_reg$coefficients["GM:year"] * EC
 #lp_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=LP)
 #summary(lp_reg)
 
-LP$y_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year
-LP$ysq_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year + lp_reg$coefficients["GM:yearsq"] * LP$yearsq
+#LP$y_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year
+#LP$ysq_effect <- lp_reg$coefficients["GM"] + lp_reg$coefficients["GM:year"] * LP$year + lp_reg$coefficients["GM:yearsq"] * LP$yearsq
 
 #8
 NC <- dat[dat$provence == "NC",]
@@ -294,6 +286,84 @@ prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
 
 ```
+
+
+###Alt Model Regressions
+```{r data, include=FALSE}
+
+##Alt Model 1
+alt1reg1 <- glm(yield ~ provence + factor(year) + bt + color + irrigated, data=altpanel1)
+summary(alt1reg1)
+altpanel1$yearsq <- altpanel1$year*altpanel1$year
+
+alt1reg2 <- glm(yield ~ provence + factor(year)+ bt + year*bt + yearsq*bt + color + irrigated, data=altpanel1)
+summary(alt1reg2)
+
+
+##Alt Model 2
+alt2reg1 <- glm(yield ~ provence + factor(year) + bt + color + irrigated, data=altpanel2)
+summary(alt2reg1)
+altpanel2$yearsq <- altpanel2$year*altpanel2$year
+
+alt2reg2 <- glm(yield ~ provence + factor(year)+ bt + year*bt + yearsq*bt + color + irrigated, data=altpanel2)
+summary(alt2reg2)
+
+
+##Alt Model 3
+alt3reg1 <- glm(yield ~ provence + factor(year) + bt + color + irrigated, data=altpanel3)
+summary(alt3reg1)
+altpanel3$yearsq <- altpanel3$year*altpanel3$year
+
+alt3reg2 <- glm(yield ~ provence + factor(year)+ bt + year*bt + yearsq*bt + color + irrigated, data=altpanel3)
+summary(alt3reg2)
+
+
+##Alt Model 4
+alt4reg1 <- glm(yield ~ provence + factor(year) + bt + color + irrigated, data=altpanel4)
+summary(alt4reg1)
+altpanel4$yearsq <- altpanel4$year*altpanel4$year
+
+alt4reg2 <- glm(yield ~ provence + factor(year)+ bt + year*bt + yearsq*bt + color + irrigated, data=altpanel4)
+summary(alt4reg2)
+
+
+##Alt Model 5
+alt5reg1 <- glm(yield ~ provence + factor(year) + bt + color + irrigated, data=altpanel5)
+summary(alt5reg1)
+altpanel5$yearsq <- altpanel5$year*altpanel5$year
+
+alt5reg2 <- glm(yield ~ provence + factor(year)+ bt + year*bt + yearsq*bt + color + irrigated, data=altpanel5)
+summary(alt5reg2)
+
+
+
+altmodels <- list(alt1reg1,alt2reg1,alt3reg1,alt4reg1,alt5reg1)
+
+install.packages("magick")
+install.packages("webshot")
+reduced2 <- c('(Intercept)' = 'Constant',
+             'provenceFS' = "Free State",
+             'provenceGP' = "GP",
+             'provenceKZN' = "KZN",
+             'provenceMP' = "MP",
+             'provenceNC' = "NC",
+             'provenceNW' = "NW",
+             'provenceWS' = "WS",
+             'bt' = "Bt",
+             'coloryellow' = "Color (yellow)",
+             'irrigated' = "Irrigated",
+             'bt x year' = "Bt x year",
+             'bt x yearsq' = "Bt x yearsq"
+             )
+altmodelregress <- msummary(altmodels,coef_map = reduced2, vcov = vcovHC, stars = TRUE)
+print(altmodelregress)
+
+msummary(models, coef_map = reduced)
+
+
+
+```
+
 
 ### yield gains peak
 ```{r data, include=FALSE}
