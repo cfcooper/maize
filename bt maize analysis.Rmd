@@ -19,9 +19,9 @@ library(pacman)
 library(sandwich,
        lmtest,
        gtsummary)
-install.packages("RColorBrewer","kableExtra", "gt")
+install.packages("ggsci")
 install.packages('modelsummary')
-library(RColorBrewer)
+library(ggsci)
 install.packages("maptools", repos="http://R-Forge.R-project.org")
 library(maptools)
 library(modelsummary)
@@ -192,14 +192,11 @@ print(modelregress)
 
 msummary(models, coef_map = reduced)
 
-dat <- readRDS("data/finalpanel.rds")
-dat$GM <- 0
-dat$GM <- ifelse(dat$technology != "conv", 1, 0)
-dat$yearsq <- dat$year*dat$year
+
 
 #1
 FS <- dat[dat$provence == "FS",]
-##FS <- FS[!FS$year == "2004",]
+FS <- FS[!FS$year == "2004",]
 fs_reg <- glm(yield ~ factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=FS)
 summary(fs_reg)
 
@@ -571,7 +568,8 @@ totalloss$yearlyloss <- totalloss$mtloss*totalloss$totalprice
 totalloss$dollarlossperht <- totalloss$yearlyloss/totalloss$Bthectare
 totalloss$kgloss <- totalloss$mtloss*1000
 totalloss$rationloss <- totalloss$kgloss/totalloss$consumption
-totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss","consumption","rationloss", "dollarlossperht")]
+totalloss$totalmaizevalue <- totalloss$totalmt*totalloss$totalprice
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss","consumption","rationloss", "dollarlossperht","totalmaizevalue")]
 
 # Cleaned Total Loss
 #write.csv(totalloss, "output/totalloss.csv")
@@ -598,6 +596,8 @@ ggloss2
 
 
 #### summary of of Bt observations in FS
+
+
 summaryfs <- bonly %>% filter(provence == "FS") %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
@@ -613,9 +613,25 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
 
 
 ### map provinces
+install.packages("GADMTools")
+library(GADMTools)
+
+
+ZAF <- gadm_sp_loadCountries('ZAF', level=2, basefile="./")
+S_ZAF <- stripSP(ZAF)
+gadm_saveStripped(ZAF, "SA")
+
+ZAF2 <- gadm_loadStripped("SA", level=2)
+
+map <- gadm_sp_loadCountries(c("NAM","BWA","ZWE","MOZ","LSO"), level=0, basefile="./")
+gadm_plot(map)
+saveAs(map, "output/MAP")
+
+
 
 
 file <-  readRDS("gadm36_ZAF_1_sp.rds")
+file2 <- readRDS("output/MAP_adm0.rds")
 coordinates_cities <- read.csv("output/locationsummary.csv")
 coordinates_cities$count <- coordinates_cities$count/500
 
@@ -623,7 +639,8 @@ summary(coordinates_cities)
 
 coordinates_cities <- arrange(coordinates_cities, desc(count))
 
-ggsa <- ggplot(file, aes(x = long, y = lat, group = group)) + 
+ggsa <- ggplot(file) +
+  ggplot(file2) + 
   geom_polygon(fill = "white") +
   geom_path(color = "black") +
   coord_equal() +
