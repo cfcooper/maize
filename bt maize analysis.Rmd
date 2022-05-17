@@ -120,8 +120,7 @@ dat %>%
   group_by(year) %>%
   summarise(mean = mean(yield, na.rm=T))
 
-dat$GM <- 0
-dat$GM <- ifelse(dat$technology != "conv", 1, 0)
+
 
 ## require 5 obs per year per province
 summaryobs <- dat %>% group_by(year, provence, color, bt) %>%
@@ -131,6 +130,9 @@ summaryobs$count <- "1"
 dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE, no.dups= TRUE)
 dat$count <- if_else(dat$count %in% c(NA), "0", "1")
 dat <- dat[!dat$count== "1", ]
+
+dat$GM <- 0
+dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
 bandconv <- dat[dat$technology %in% c("B", "conv"),]
 bandconv <- bandconv[!bandconv$provence == "LP",]
@@ -617,17 +619,18 @@ install.packages("GADMTools")
 library(GADMTools)
 
 
-ZAF <- gadm_sp_loadCountries('ZAF', level=2, basefile="./")
-S_ZAF <- stripSP(ZAF)
+ZAF <- gadm_sp_loadCountries('ZAF', level=1, basefile="./")
 gadm_saveStripped(ZAF, "SA")
 
-ZAF2 <- gadm_loadStripped("SA", level=2)
+ZAF2 <- gadm_loadStripped("SA", level=1)
 
 map <- gadm_sp_loadCountries(c("NAM","BWA","ZWE","MOZ","LSO"), level=0, basefile="./")
-gadm_plot(map)
+gadm_plot(ZAF)
+saveAs(ZAF, "output/SA")
 saveAs(map, "output/MAP")
 
-
+library(sf)
+  SA <- st_read("gadm40_ZAF_1.shp")
 
 
 file <-  readRDS("gadm36_ZAF_1_sp.rds")
@@ -639,10 +642,8 @@ summary(coordinates_cities)
 
 coordinates_cities <- arrange(coordinates_cities, desc(count))
 
-ggsa <- ggplot(file) +
-  ggplot(file2) + 
+ggsa <- ggplot(data = file, aes(x = long, y = lat)) +
   geom_polygon(fill = "white") +
-  geom_path(color = "black") +
   coord_equal() +
   geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "darkseagreen", 
              size= coordinates_cities$count, inherit.aes = FALSE)

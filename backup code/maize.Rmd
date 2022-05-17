@@ -266,6 +266,88 @@ summary(reg1)
 
 ```
 
+```{r datasummary stats, include=false}
+
+genetics <- dat[dat$cultivar_name == "CRN3505",]
+genetics2 <- dat[dat$cultivar_name == "DKC78-15B",]
+genetics <- bind_rows(genetics,genetics2)
+genetics <- genetics[,c("year", "provence", "locality", "cultivar_name", "yield", "color", "technology", "Bt")]
+
+summarygen <- dat %>% 
+  group_by(cultivar_name, technology, release_year, .add = FALSE) %>% 
+            count()
+write.csv(summarygen, "output/releaseyear.csv")
+
+p <- ggplot(data = summarygen, aes(x = year, y = mean)) + geom_smooth(aes(color=cultivar_name))
+
+print(p)
+
+write.csv(genetics, "output/cultivartest.csv")
+
+summary(dat$provence)
+
+#number of trials by year
+
+summaryloc <- dat %>% group_by(year, provence, GM) %>% summarise(count = n()) # check location if in more than one year
+summaryloc2 <- summaryloc %>% group_by() %>% summarise(count = n())
+summaryloc3 <- summaryloc %>% group_by(year) %>% summarise (count = n()) # show how many trials per year
+
+write.csv(summaryloc, "trialsbyyear.csv")
+
+# white mean by year
+color <- dat %>% group_by(color) %>% summarise (count = n())
+pwhite <- bandconv %>% filter(color == "white") %>%
+            group_by(color,technology, year, .add = FALSE) %>%
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p<- ggplot(pwhite, aes(year, mean)) + geom_smooth(aes(color=technology), size = 1) + 
+  ggtitle('White Yield Over Time') + 
+  theme_bw() +
+scale_color_brewer(palette = "Paired")
+  plot(p)
+
+
+pdry <- dat %>% filter(irrigated == 0) %>%
+           group_by(color,technology, year, .add = FALSE) %>%
+           summarise(mean = mean(yield, na.rm = T), 
+           SD = sd(yield, na.rm = T))
+
+# Bt mean by year
+pbt <- dat %>% filter(technology == "B") %>%
+            group_by(color, year, .add = FALSE) %>%
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(pbt, aes(year, mean)) + geom_smooth(aes(color=color), size = 1) + ggtitle('Bt Yield Over Time')
+plot(p)
+
+
+
+
+# RR mean by year
+prr <- dat %>% filter(technology == "R") %>%
+            group_by(color, year, .add = FALSE) %>%
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(prr, aes(year, mean))
+p + geom_smooth(aes(color=color), size = 1)
+```
+
+# number of cultivars by year
+summarydry <- dat %>% group_by(irrigated) %>% summarise(count = n())
+summarycult <- dat %>% group_by(cultivar_name) %>% summarise(count = n())
+summarycult <- dat %>% group_by(year, cultivar_name) %>% summarise(count = n()) 
+summarycult <- summarycult %>% group_by(year) %>% summarise (count = n())
+
+
+# number of trials by cultivar
+summaryloccult <- dat %>% group_by(cultivar_name,year, locality) %>% summarise(count = n()) 
+summaryloccult <- summaryloccult %>% group_by(cultivar_name) %>% summarise (count = n())
+
+write_rds(dat, "data/finalpanel.rds")
+dat <- readRDS("data/finalpanel.rds")
 
 
 
