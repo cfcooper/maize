@@ -647,10 +647,11 @@ ggsa <- ggplot() +
   geom_sf(aes(),LS2)+
   geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "darkseagreen", 
              size= coordinates_cities$count, inherit.aes = FALSE)+
-  coord_sf(xlim= c(15,35), ylim= c(-35,-22), clip = "on")
+  coord_sf(xlim= c(15,35), ylim= c(-35,-22), clip = "on") +
+  labs(title = "Location Coordinates")
   
 print(ggsa)
-
+ggsave("ggsa.jpeg", ggsa)
 
 
 
