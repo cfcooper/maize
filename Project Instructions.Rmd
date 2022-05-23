@@ -29,6 +29,8 @@ install.packages("RColorBrewer")
 install.packages("kableExtra")
 install.packages("modelsummary")
 install.packages("gtsummary")
+install.packages("fixest")
+library(fixest)
 
 library(gt)
 library(sandwich,

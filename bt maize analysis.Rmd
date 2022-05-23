@@ -148,13 +148,12 @@ p <- ggplot(summarynew, aes(year, mean))
 p + geom_smooth(aes(color=color), size = 1) +
   facet_wrap(~provence)
 
-reg1 <- glm(yield ~ provence + factor(year) + GM + color + irrigated, data=dat)
+reg1 <- feglm(yield ~ GM + color | provence + factor(year)+ irrigated, dat)
 summary(reg1)
-
 
 dat$yearsq <- dat$year*dat$year
 
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
+reg2 <- feglm(yield ~ GM + color + i(year*GM) + i(yearsq*GM) | provence + factor(year)+ irrigated, dat)
 summary(reg2)
 
 
@@ -164,17 +163,17 @@ dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$y
 max(dat$ysq_effect)
 
 
-
 # Provence by year by GM effects in one model
 
 ## LEFT OFF HERE ** above
-reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
+reg3 <- feglm(yield ~ GM + color+ i(year*provence*GM) + i(provence*yearsq*GM) | provence + factor(year)+ + irrigated, dat)
 summary(reg3)
 
 models <- list(reg1,reg2,reg3)
 
-install.packages("magick")
-install.packages("webshot")
+
+modelregress <- msummary(models, vcov = vcovHC, stars = TRUE)
+print(modelregress)
 reduced <- c('(Intercept)' = 'Constant',
              'provenceFS' = "Free State",
              'provenceGP' = "GP",
@@ -189,11 +188,8 @@ reduced <- c('(Intercept)' = 'Constant',
              'GM x year' = "GM x year",
              'GM x yearsq' = "GM x yearsq"
              )
-modelregress <- msummary(models,coef_map = reduced, vcov = vcovHC, stars = TRUE)
-print(modelregress)
 
-msummary(models, coef_map = reduced)
-
+msummary(modelregress, coef_map = reduced)
 
 
 #1
@@ -615,26 +611,25 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
 
 
 ### map provinces
-install.packages("GADMTools")
-library(GADMTools)
+install.packages("raster")
+
+SA = getData('GADM', country='ZAF', level=1)
+NAM = getData('GADM', country='NAM', level=0)
+BOT = getData('GADM', country='BWA', level=0)
+ZWE = getData('GADM', country='ZWE', level=0)
+MOZ = getData('GADM', country='MOZ', level=0)
+SWZ = getData('GADM', country='SWZ', level=0)
+LSO = getData('GADM', country='LSO', level=0)
 
 
-ZAF <- gadm_sp_loadCountries('ZAF', level=1, basefile="./")
-gadm_saveStripped(ZAF, "SA")
+SA2 = st_as_sf(SA)
+NA2 = st_as_sf(NAM)
+BO2 = st_as_sf(BOT)
+ZW2 = st_as_sf(ZWE)
+MO2 = st_as_sf(MOZ)
+SW2 = st_as_sf(SWZ)
+LS2 = st_as_sf(LSO)
 
-ZAF2 <- gadm_loadStripped("SA", level=1)
-
-map <- gadm_sp_loadCountries(c("NAM","BWA","ZWE","MOZ","LSO"), level=0, basefile="./")
-gadm_plot(ZAF)
-saveAs(ZAF, "output/SA")
-saveAs(map, "output/MAP")
-
-library(sf)
-  SA <- st_read("gadm40_ZAF_1.shp")
-
-
-file <-  readRDS("gadm36_ZAF_1_sp.rds")
-file2 <- readRDS("output/MAP_adm0.rds")
 coordinates_cities <- read.csv("output/locationsummary.csv")
 coordinates_cities$count <- coordinates_cities$count/500
 
@@ -642,12 +637,19 @@ summary(coordinates_cities)
 
 coordinates_cities <- arrange(coordinates_cities, desc(count))
 
-ggsa <- ggplot(data = file, aes(x = long, y = lat)) +
-  geom_polygon(fill = "white") +
-  coord_equal() +
+ggsa <- ggplot() +
+  geom_sf(aes(),SA2, fill = "white") +
+  geom_sf(aes(),NA2) +
+  geom_sf(aes(),BO2) +
+  geom_sf(aes(),ZW2) +
+  geom_sf(aes(),MO2) +
+  geom_sf(aes(),SW2) +
+  geom_sf(aes(),LS2)+
   geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "darkseagreen", 
-             size= coordinates_cities$count, inherit.aes = FALSE)
-ggsa
+             size= coordinates_cities$count, inherit.aes = FALSE)+
+  coord_sf(xlim= c(15,35), ylim= c(-35,-22), clip = "on")
+  
+print(ggsa)
 
 
 
