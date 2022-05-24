@@ -144,10 +144,6 @@ summarynew <- dat %>% group_by(provence,color, technology, year, .add = FALSE) %
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(summarynew, aes(year, mean))
-p + geom_smooth(aes(color=color), size = 1) +
-  facet_wrap(~provence)
-
 reg1 <- feglm(yield ~ GM + color | provence + factor(year)+ irrigated, dat)
 summary(reg1)
 
@@ -638,6 +634,7 @@ summary(coordinates_cities)
 coordinates_cities <- arrange(coordinates_cities, desc(count))
 
 ggsa <- ggplot() +
+  theme_bw() +
   geom_sf(aes(),SA2, fill = "white") +
   geom_sf(aes(),NA2) +
   geom_sf(aes(),BO2) +
@@ -645,7 +642,7 @@ ggsa <- ggplot() +
   geom_sf(aes(),MO2) +
   geom_sf(aes(),SW2) +
   geom_sf(aes(),LS2)+
-  geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "darkseagreen", 
+  geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "#bbbe64", 
              size= coordinates_cities$count, inherit.aes = FALSE)+
   coord_sf(xlim= c(15,35), ylim= c(-35,-22), clip = "on") +
   labs(title = "Location Coordinates")
@@ -702,7 +699,7 @@ post <- bandconv[bandconv$year > "1999",]
 
 post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
 btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
-  geom_boxplot(aes(color=bt), size = 1)
+  geom_boxplot(aes(color=bt), size = .75)
 
 btgg2 <- btgg +
   theme_bw() +
@@ -712,26 +709,28 @@ btgg2 <- btgg +
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time"
   ) +
-  scale_colour_brewer(palette = "Paired")
+  scale_colour_manual(values = c("bt" = "#db2763", "conv" = "#628395")) + 
+  coord_cartesian(ylim = c(.0,25), clip = "on")
 print(btgg2)
+ggsave("output/btgg2.jpg",plot=btgg2,device = "jpg")
 
 provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
-  geom_boxplot(aes(color=bt), size = 1, outlier.shape = NA) +
+  geom_boxplot(aes(color=bt), size = .5, outlier.shape = NA) +
   theme_bw() +
   labs(
     x = "Year",
     y = "Yield",
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time") +
-  scale_colour_brewer(palette = "Paired")+
+  scale_colour_manual(values = c("bt" = "#db2763", "conv" = "#628395"))+
   facet_wrap(~provence, scale="free")
 print(provboxplot)
-
+ggsave("output/provboxplot.jpg",plot=provboxplot,device = "jpg")
 
 
 #box plot for yield by year, yellow/white
 colgg <- ggplot(post, aes(year, yield, group= interaction(color, year))) + 
-  geom_boxplot(aes(color=color), size = 1)
+  geom_boxplot(aes(color=color), size = .75)
 colgg2 <- colgg +
   theme_bw() +
   labs(
@@ -740,7 +739,10 @@ colgg2 <- colgg +
     colour = "Color",
     title = "Yield Differences Between Yellow and White Over Time"
   ) +
-  scale_colour_brewer(palette = "Paired")
+ scale_colour_manual(values = c("yellow" = "#db2763", "white" = "#628395"))+ 
+  coord_cartesian(ylim = c(.0,25), clip = "on")
 colgg2
+ggsave("output/colgg2.jpg",plot=colgg2,device = "jpg")
+
 
 ```

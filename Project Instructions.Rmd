@@ -42,6 +42,9 @@ library(RColorBrewer)
 library(modelsummary)
 library(stringr)
 
+install.packages("devtools")
+devtools::install_github("jaredhuling/jcolors")
+library(jcolors)
 
 
 install.packages("maptools", repos="http://R-Forge.R-project.org")
