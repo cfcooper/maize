@@ -144,12 +144,12 @@ summarynew <- dat %>% group_by(provence,color, technology, year, .add = FALSE) %
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-reg1 <- feglm(yield ~ GM + color | provence + factor(year)+ irrigated, dat)
+reg1 <- glm(yield ~ GM + color + provence + factor(year) + irrigated,data = dat)
 summary(reg1)
 
 dat$yearsq <- dat$year*dat$year
 
-reg2 <- feglm(yield ~ GM + color + i(year*GM) + i(yearsq*GM) | provence + factor(year)+ irrigated, dat)
+reg2 <- glm(yield ~ GM + color + year*GM + yearsq*GM + provence + factor(year)+ irrigated,data = dat)
 summary(reg2)
 
 
@@ -162,7 +162,7 @@ max(dat$ysq_effect)
 # Provence by year by GM effects in one model
 
 ## LEFT OFF HERE ** above
-reg3 <- feglm(yield ~ GM + color+ i(year*provence*GM) + i(provence*yearsq*GM) | provence + factor(year)+ + irrigated, dat)
+reg3 <- glm(yield ~ GM + color+ year*provence*GM + provence*yearsq*GM + provence + factor(year)+ + irrigated,data = dat)
 summary(reg3)
 
 models <- list(reg1,reg2,reg3)
@@ -276,6 +276,12 @@ prov2 <- rbind(EC, FS, GP, MP, NW, KZN, NC, WC)
 prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
 
+summarywc <- WC %>% group_by(year, GM, color, .add = FALSE) %>%
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T),
+            ysqeffect = mean(ysq_effect, na.rm = T))
+
+
 ```
 
 
@@ -360,10 +366,9 @@ msummary(models, coef_map = reduced)
 ```{r data, include=FALSE}
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-provence <- c("FS","NW", "GP", "MP", "KZN", "WC")
+provence <- c("northregion", 'GP', 'MP', 'KZN', 'WC')
 
-ysq_effect <- c(max(FS$ysq_effect),
-                max(NW$ysq_effect), 
+ysq_effect <- c(max(northregion$ysq_effect), 
                 max(GP$ysq_effect), 
                 max(MP$ysq_effect), 
                 max(KZN$ysq_effect), 
@@ -372,17 +377,17 @@ ysq_effect <- c(max(FS$ysq_effect),
 
 breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
-prov4 <- prov2[,c("provence", "ysq_effect", "year")]
+prov4 <- prov[,c("provence", "ysq_effect", "year")]
 breakpoint <- merge(breakpoint, prov4, by = c("ysq_effect","provence"), no.dups = TRUE)
 breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
-summaryb <- prov2 %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
+summaryb <- prov %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
 breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
 
-summaryb2 <- prov2 %>% filter(bt == 1) %>%
+summaryb2 <- prov %>% filter(bt == 1) %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
 
