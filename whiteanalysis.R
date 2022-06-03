@@ -10,7 +10,11 @@ dat %>%
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
-dat <- dat[!dat$color == "white",]
+dat <- dat[!dat$color == "yellow",]
+bandconv <- dat[dat$technology %in% c("B", "conv"),]
+
+
+dat <- bandconv
 
 reg1 <- glm(yield ~ provence + factor(year) + GM + irrigated, data=dat)
 summary(reg1)
@@ -135,30 +139,28 @@ prov2 <- prov2[!prov2$provence == "LP",]
 
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-provence <- c("FS","NW", "GP", "MP", "KZN", "LP", "WC")
+provence <- c("northregion", 'GP', 'MP', 'KZN', 'WC')
 
-ysq_effect <- c(max(FS$ysq_effect),
-                max(NW$ysq_effect), 
+ysq_effect <- c(max(northregion$ysq_effect), 
                 max(GP$ysq_effect), 
                 max(MP$ysq_effect), 
                 max(KZN$ysq_effect), 
-                max(LP$ysq_effect), 
                 max(WC$ysq_effect))
 
 
 breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
-prov4 <- prov2[,c("provence", "ysq_effect", "year")]
+prov4 <- prov[,c("provence", "ysq_effect", "year")]
 breakpoint <- merge(breakpoint, prov4, by = c("ysq_effect","provence"), no.dups = TRUE)
 breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
-summaryb <- prov2 %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
+summaryb <- prov %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
 breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
 
-summaryb2 <- prov2 %>% filter(bt == 1) %>%
+summaryb2 <- prov %>% filter(bt == 1) %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
 
@@ -166,6 +168,7 @@ breakpoint2 <- merge(breakpoint, summaryb2, by = c("provence","year","color"), n
 breakpoint2 <- breakpoint2[,c("year", "provence", "color", "ysq_effect", "mean", "SD", "count")]
 breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 
+write.csv(breakpoint2, "output/whitebreakpoint.csv")
 
 proveffects <- breakpoint2 %>%
   gt(rowname_col = "province") %>%
@@ -218,7 +221,7 @@ gploss <- gploss[,c("year", "provence", "color","technology", "ysq_effect", "mea
 
 gploss <- gploss[gploss$technology == "B",]
 gploss <- gploss[!duplicated(gploss), ]
-gploss$maxysq <- ifelse(gploss$year<2010, NA, max(gploss$ysq_effect))
+gploss$maxysq <- ifelse(gploss$year<2009, NA, max(gploss$ysq_effect))
 gploss$gain_loss <- gploss$ysq_effect - gploss$maxysq
 
 gploss <- merge(gploss, maizeprod, by = c("year"), no.dups = TRUE)
@@ -238,7 +241,7 @@ kznloss <- kznloss[,c("year", "provence", "color","technology", "ysq_effect", "m
 
 kznloss <- kznloss[kznloss$technology == "B",]
 kznloss <- kznloss[!duplicated(kznloss), ]
-kznloss$maxysq <- ifelse(kznloss$year<2012, NA, max(kznloss$ysq_effect))
+kznloss$maxysq <- ifelse(kznloss$year<2010, NA, max(kznloss$ysq_effect))
 kznloss$gain_loss <- kznloss$ysq_effect - kznloss$maxysq
 
 kznloss <- merge(kznloss, maizeprod, by = c("year"), no.dups = TRUE)
@@ -258,7 +261,7 @@ mploss <- mploss[,c("year", "provence", "color","technology", "ysq_effect", "mea
 
 mploss <- mploss[mploss$technology == "B",]
 mploss <- mploss[!duplicated(mploss), ]
-mploss$maxysq <- ifelse(mploss$year<2011, NA, max(mploss$ysq_effect))
+mploss$maxysq <- ifelse(mploss$year<2018, NA, max(mploss$ysq_effect))
 mploss$gain_loss <- mploss$ysq_effect - mploss$maxysq
 
 mploss <- merge(mploss, maizeprod, by = c("year"), no.dups = TRUE)
@@ -278,7 +281,7 @@ northloss <- northloss[,c("year", "provence", "provence", "color","technology", 
 
 northloss <- northloss[northloss$technology == "B",]
 northloss <- northloss[!duplicated(northloss), ]
-northloss$maxysq <- ifelse(northloss$year<2011, NA, max(northloss$ysq_effect))
+northloss$maxysq <- ifelse(northloss$year<2008, NA, max(northloss$ysq_effect))
 northloss$gain_loss <- northloss$ysq_effect - northloss$maxysq
 
 northloss <- merge(northloss, maizeprod, by = c("year"), no.dups = TRUE)
@@ -298,7 +301,7 @@ wcloss <- wcloss[,c("year", "provence", "color","technology", "ysq_effect", "mea
 
 wcloss <- wcloss[wcloss$technology == "B",]
 wcloss <- wcloss[!duplicated(wcloss), ]
-wcloss$maxysq <- ifelse(wcloss$year<2010, NA, max(wcloss$ysq_effect))
+wcloss$maxysq <- ifelse(wcloss$year<2018, NA, max(wcloss$ysq_effect))
 wcloss$gain_loss <- wcloss$ysq_effect - wcloss$maxysq
 
 wcloss <- merge(wcloss, maizeprod, by = c("year"), no.dups = TRUE)
@@ -310,6 +313,15 @@ wcloss <- wcloss[,c("year", "provence", "color", "ysq_effect","maxysq","gain_los
 
 ## Combining Prov Level Gains Lost
 provloss <- rbind(northloss, gploss, mploss, kznloss, wcloss)
+provloss <- na.omit(provloss)
+
+provloss2 <- provloss %>%
+  group_by(year, .add = FALSE) %>%
+  summarise(averagemtlost = mean(mtloss, na.rm = T),
+            totalhalost = sum(mtloss, na.rm = T),
+            yearlyloss = sum(yearlyloss, na.rm = T)
+            )
+
 
 #############################
 

@@ -5,15 +5,14 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 p_load(sandwich,
        lmtest,
-       gtsummary)
+       gtsummary,
+       segmented,
+       Rcpp)
 install.packages("RColorBrewer")
 library(RColorBrewer)
-install.packages("maptools", repos="http://R-Forge.R-project.org")
-library(maptools)
+
 
 dat <- readRDS("data/finalpanel.rds")
-
-#test test test
 
 dat %>%
   group_by(year) %>%
@@ -22,11 +21,10 @@ dat %>%
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
-bandconv <- dat[dat$technology %in% c("B", "conv"),]
-bandconv <- bandconv[!bandconv$provence == "LP",]
-
-dat <- bandconv
-
+pre <- dat[dat$year < 2011,]
+post <- dat[dat$year > "1999",]
+allb <- dat[dat$bt == 1,]
+bonly <- dat[dat$technology == "B",]
 
 summarynew <- dat %>% group_by(provence,color, technology, year, .add = FALSE) %>% 
   summarise(mean = mean(yield, na.rm = T), 
@@ -41,14 +39,18 @@ pre_reg <- glm(yield ~ provence + factor(year) + GM + color, data=pre)
 sum_prereg <- summary(pre_reg)
 sum_prereg
 
+bandconv <- dat[dat$technology %in% c("B", "conv"),]
+bandconv <- bandconv[!bandconv$provence == "LP",]
+
+dat <- bandconv
+
 reg1 <- glm(yield ~ provence + factor(year) + GM + color + irrigated, data=dat)
 summary(reg1)
 
 
 dat$yearsq <- dat$year*dat$year
 
-#reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
-reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + color*GM + irrigated, data=dat)
+reg2 <- glm(yield ~ provence + factor(year)+ GM + year*GM + yearsq*GM + color + irrigated, data=dat)
 summary(reg2)
 
 dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
@@ -60,20 +62,6 @@ max(dat$ysq_effect)
 
 # Provence by year by GM effects in one model
 ## Need to add robust standard errors using jtools, sandwich, and lmtest packages
-
-reg2coeffs_cl <- coeftest(reg2, vcov = vcovCL, cluster = ~provence)
-print(reg2coeffs_cl)
-
-
-## LEFT OFF HERE ** above
-
-
-
-
-
-
-
-
 reg3 <- glm(yield ~ provence + factor(year)+ GM + provence*year*GM + provence*yearsq*GM + color + irrigated, data=dat)
 summary(reg3)
 
@@ -172,7 +160,7 @@ northregion$y_effect <- north_reg$coefficients["GM"] + north_reg$coefficients["G
 northregion$ysq_effect <- north_reg$coefficients["GM"] + north_reg$coefficients["GM:year"] * northregion$year + north_reg$coefficients["GM:yearsq"] * northregion$yearsq
 
 northregion$provence <- "northregion"
-prov <- rbind(northregion, GP, MP, KZN, WC)
+prov <- rbind(northregion, GP, MP, KZN, LP, WC)
 prov2 <- rbind(EC, FS, GP, MP, NW, KZN, LP, NC, WC)
 prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
@@ -181,10 +169,9 @@ prov2 <- prov2[!prov2$provence == "LP",]
 
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
-provence <- c("FS","NW", "GP", "MP", "KZN", "WC")
+provence <- c("northregion", "GP", "MP", "KZN", "WC")
 
-ysq_effect <- c(max(FS$ysq_effect),
-                max(NW$ysq_effect), 
+ysq_effect <- c(max(northregion$ysq_effect), 
                 max(GP$ysq_effect), 
                 max(MP$ysq_effect), 
                 max(KZN$ysq_effect), 
@@ -193,17 +180,17 @@ ysq_effect <- c(max(FS$ysq_effect),
 
 breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
-prov4 <- prov2[,c("provence", "ysq_effect", "year")]
+prov4 <- prov[,c("provence", "ysq_effect", "year")]
 breakpoint <- merge(breakpoint, prov4, by = c("ysq_effect","provence"), no.dups = TRUE)
 breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
-summaryb <- prov2 %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
+summaryb <- prov %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
 breakpoint <- merge(breakpoint, summaryb, by = c("provence","year"), no.dups = TRUE)
 
-summaryb2 <- prov2 %>% filter(bt == 1) %>%
+summaryb2 <- prov %>% filter(bt == 1) %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
 
@@ -381,14 +368,9 @@ totalloss <- merge(totalloss, maizeprod, by = c("year"), no.dups = TRUE)
 totalloss$mtloss <- (totalloss$gain_loss*totalloss$Bthectare)*-1
 totalloss$yearlyloss <- totalloss$mtloss*totalloss$totalprice
 totalloss$dollarlossperht <- totalloss$yearlyloss/totalloss$Bthectare
-totalloss$kgloss <- totalloss$mtloss*1000
-totalloss$rationloss <- totalloss$kgloss/totalloss$consumption
-totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss","consumption","rationloss", "dollarlossperht")]
+totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht")]
 
-# Cleaned Total Loss
-#write.csv(totalloss, "output/totalloss.csv")
-
-totalloss <- totalloss[totalloss$year > 2010,]
+write.csv(totalloss, "output/totalloss.csv")
 
 
 ggloss <- ggplot(totalloss,aes(x = year, y = yearlyloss, fill = year))+
@@ -424,26 +406,6 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
 ### predict economic loss
 
 
-### map provinces
-
-
-file <-  readRDS("gadm36_ZAF_1_sp.rds")
-coordinates_cities <- read.csv("output/locationsummary.csv")
-coordinates_cities$count <- coordinates_cities$count/500
-
-summary(coordinates_cities)
-
-coordinates_cities <- arrange(coordinates_cities, desc(count))
-
-ggsa <- ggplot(file, aes(x = long, y = lat, group = group)) + 
-  geom_polygon(fill = "white") +
-  geom_path(color = "black") +
-  coord_equal() +
-  geom_point(data = coordinates_cities, aes(x = long, y = lat), alpha=0.75, col = "darkseagreen", 
-             size= coordinates_cities$count, inherit.aes = FALSE)
-ggsa
-
-
 
 
 ## different specifications - quadratic, sin(year) and cosine(year)
@@ -456,10 +418,11 @@ prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
 
 
-ggplot(data=prov)+
+ggplot(data=prov2)+
   geom_line(aes(year, ysq_effect, color=provence), size=1) + 
   scale_color_brewer(palette = "Paired") +
-  coord_cartesian(xlim= c(1999,2020), ylim = c(-.05,.55), clip = "on")
+  labs(title = "Yield Gains Due to GM Technology") +
+  coord_cartesian(xlim= c(1998,2020), ylim = c(-.05,.5), clip = "on")
 
 
 
@@ -489,7 +452,7 @@ tbl_summary(mergedt1) %>% as_flex_table()
 #graphs for presentation
 
 #box plot for yield by year, bt/non bt
-post <- dat[dat$year > "1999",]
+post <- prov[prov$year > "1999",]
 
 post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
 btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
@@ -503,18 +466,18 @@ btgg2 <- btgg +
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time"
   ) +
-  scale_colour_brewer(palette = "Dark2")
+  scale_colour_brewer(palette = "Paired")
 btgg2
 
 provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
-  geom_boxplot(aes(color=bt), size = .5, outlier.shape = NA) +
+  geom_boxplot(aes(color=bt), size = 1, outlier.shape = NA) +
   theme_bw() +
   labs(
     x = "Year",
     y = "Yield",
     colour = "Technology Type",
     title = "Yield Differences Between Bt and Conventional Over Time") +
-  scale_colour_brewer(palette = "Dark2")+
+  scale_colour_brewer(palette = "Paired")+
   facet_wrap(~provence, scale="free")
 provboxplot
 
@@ -531,7 +494,7 @@ colgg2 <- colgg +
     colour = "Color",
     title = "Yield Differences Between Yellow and White Over Time"
   ) +
-  scale_colour_brewer(palette = "Dark2")
+  scale_colour_brewer(palette = "Paired")
 colgg2
 
 #################################################################################
