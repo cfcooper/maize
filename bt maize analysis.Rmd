@@ -131,6 +131,10 @@ dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE,
 dat$count <- if_else(dat$count %in% c(NA), "0", "1")
 dat <- dat[!dat$count== "1", ]
 
+summaryobs <- dat %>% group_by(bt, year, provence, color) %>%
+  summarise(count = n())
+
+
 dat$GM <- 0
 dat$GM <- ifelse(dat$technology != "conv", 1, 0)
 
@@ -186,6 +190,11 @@ reduced <- c('(Intercept)' = 'Constant',
              )
 
 msummary(modelregress, coef_map = reduced)
+
+
+install.packages("stargazer")
+library(stargazer)
+stargazer(reg1, reg2, reg3, title="Regression Results",out = "output/regress.html", align=TRUE, omit = c(":",  "factor\\(year\\)1982","factor\\(year\\)1984","factor\\(year\\)1985","factor\\(year\\)1986","factor\\(year\\)1987","factor\\(year\\)1988","factor\\(year\\)1989","factor\\(year\\)1990","factor\\(year\\)1991","factor\\(year\\)1993","factor\\(year\\)1994","factor\\(year\\)1995","factor\\(year\\)1996","factor\\(year\\)1997","factor\\(year\\)1998","factor\\(year\\)1999","factor\\(year\\)2000","factor\\(year\\)2001","factor\\(year\\)2002","factor\\(year\\)2003","factor\\(year\\)2004","factor\\(year\\)2005","factor\\(year\\)2006","factor\\(year\\)2007","factor\\(year\\)2008","factor\\(year\\)2009","factor\\(year\\)2010","factor\\(year\\)2011","factor\\(year\\)2012","factor\\(year\\)2013","factor\\(year\\)2014","factor\\(year\\)2015","factor\\(year\\)2016","factor\\(year\\)2017","factor\\(year\\)2018","factor\\(year\\)2019"))
 
 
 #1
@@ -272,9 +281,7 @@ northregion$ysq_effect <- north_reg$coefficients["GM"] + north_reg$coefficients[
 
 northregion$provence <- "northregion"
 prov <- rbind(northregion, GP, MP, KZN, WC)
-prov2 <- rbind(EC, FS, GP, MP, NW, KZN, NC, WC)
-prov2 <- prov2[!prov2$provence == "EC",]
-prov2 <- prov2[!prov2$provence == "LP",]
+
 
 summarywc <- WC %>% group_by(year, GM, color, .add = FALSE) %>%
   summarise(mean = mean(yield, na.rm = T), 
@@ -379,6 +386,8 @@ breakpoint <- data.frame(provence, ysq_effect)
 rm(provence, ysq_effect)
 prov2 <- prov[,c("provence", "ysq_effect", "year")]
 breakpoint <- merge(breakpoint, prov2, by = c("ysq_effect","provence"), no.dups = TRUE)
+prov3 <- prov2[!duplicated(prov2), ]
+
 breakpoint <- breakpoint[!duplicated(breakpoint), ]
 
 summaryb <- prov %>% filter(bt == 1) %>% group_by(color, year, provence, .add = FALSE) %>%
@@ -396,6 +405,11 @@ breakpoint2 <- breakpoint2[,c("year", "provence", "color", "ysq_effect", "mean",
 breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 
 write.csv(breakpoint2, "output/breakpoint.csv")
+
+ggbreak <- ggplot(prov3,aes(year,ysq_effect))+
+  geom_smooth(aes(color=provence), size = 1) +
+  theme_bw() + coord_cartesian(xlim= c(1999,2020), ylim = c(-.05,.6), clip = "on")
+ggbreak
 
 proveffects <- breakpoint2 %>%
   gt(rowname_col = "province") %>%
@@ -667,8 +681,8 @@ ggsave("ggsa.jpeg", ggsa)
 prov2 <- prov2[!prov2$provence == "EC",]
 prov2 <- prov2[!prov2$provence == "LP",]
 
-
-ggplot(data=prov)+
+prov5 <- prov[!prov$provence == "WC",]
+ggplot(data=prov5)+
   geom_line(aes(year, ysq_effect, color=provence), size=1) + 
   scale_color_brewer(palette = "Paired") +
   coord_cartesian(xlim= c(1999,2020), ylim = c(-.05,.55), clip = "on")
