@@ -8,3 +8,5 @@ data/
 output/
 test-figure/
 .DS_Store
+.allyears.csv.icloud
+.test.md.icloud

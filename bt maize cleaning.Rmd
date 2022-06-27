@@ -79,8 +79,8 @@ summarynew <- dat %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(summarynew, aes(year, mean))
-p + geom_smooth(aes(color=technology), size = 1)
+p <- ggplot(summarynew, aes(year, mean))+ geom_smooth(aes(color=technology), size = 1.25) + theme_bw() + scale_color_jcolors(palette = "pal5")
+p
 
 write.csv(summarynew, "output/summary.csv")
 ```
@@ -258,8 +258,6 @@ summaryall <- dat %>%
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
-p <- ggplot(dat, aes(year, yield))
-p + geom_smooth(aes(color= technology), size = 1)
 
 write.csv(dat,"data/allyearsmerge.csv")
 

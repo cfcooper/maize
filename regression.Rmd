@@ -1,0 +1,72 @@
+---
+title: "regression"
+author: "Courtney Cooper"
+date: '2022-06-06'
+output: html_document
+---
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(stargazer)
+library(magrittr)
+library(dplyr)
+```
+
+Here is the latex table in a PDF document:
+
+```{r mylatextable, results = "asis"}
+dat <- readRDS("data/finalpanel.rds")
+dat %>%
+  group_by(year) %>%
+  summarise(mean = mean(yield, na.rm=T))
+
+
+
+## require 5 obs per year per province
+summaryobs <- dat %>% group_by(year, provence, color, bt) %>%
+  summarise(count = n()) # check bt if in more than one observation per province/year
+summaryobs <- summaryobs[summaryobs$count < 5,]
+summaryobs$count <- "1"
+dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE, no.dups= TRUE)
+dat$count <- if_else(dat$count %in% c(NA), "0", "1")
+dat <- dat[!dat$count== "1", ]
+
+summaryobs <- dat %>% group_by(bt, year, provence, color) %>%
+  summarise(count = n())
+
+
+dat$GM <- 0
+dat$GM <- ifelse(dat$technology != "conv", 1, 0)
+
+bandconv <- dat[dat$technology %in% c("B", "conv"),]
+bandconv <- bandconv[!bandconv$provence == "LP",]
+
+dat <- bandconv
+
+reg1 <- glm(yield ~ GM + color + provence + factor(year) + irrigated,data = dat)
+summary(reg1)
+
+dat$yearsq <- dat$year*dat$year
+
+reg2 <- glm(yield ~ GM + color + year*GM + yearsq*GM + provence + factor(year)+ irrigated,data = dat)
+summary(reg2)
+
+
+dat$y_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year
+dat$ysq_effect <- reg2$coefficients["GM"] + reg2$coefficients["GM:year"] * dat$year + reg2$coefficients["GM:yearsq"] * dat$yearsq
+
+max(dat$ysq_effect)
+
+
+# Provence by year by GM effects in one model
+
+## LEFT OFF HERE ** above
+reg3 <- glm(yield ~ GM + color+ year*provence*GM + provence*yearsq*GM + provence + factor(year)+ + irrigated,data = dat)
+summary(reg3)
+
+
+stargazer(reg1, reg2, reg3, title="Regression Results", align=TRUE)
+
+```
