@@ -24,6 +24,8 @@ Order of Files-
 packages needed:
 
 ```{equations}
+library(equatiomatic)
+
 dat <- readRDS("data/finalpanel.rds")
 
 dat %>%
