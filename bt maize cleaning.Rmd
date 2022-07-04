@@ -391,6 +391,13 @@ write.csv(wbtsummarystat,"wbtsummarystat.csv")
 # Just B obs (no conv)
 bonly <- dat[(dat$technology == "B"),]
 
+summstat <- dat %>%
+  group_by(technology, year, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T),
+                      SD = sd(yield, na.rm = T),
+                      min = min(year, na.rm = T),
+                      max = max(year, na.rm = T))
+
 bonlysummarystat <- bonly %>%
   group_by(technology, provence, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T),

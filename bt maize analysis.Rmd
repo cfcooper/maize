@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ### Import Panel Data
+
 ```{r data, include=FALSE}
 rm(list=ls()) # Caution: this clears the Environment
 
@@ -21,6 +22,8 @@ library(sandwich,
        gtsummary)
 install.packages("ggsci")
 install.packages('modelsummary')
+install.packages("equatiomatic")
+library(equatiomatic)
 library(ggsci)
 install.packages("maptools", repos="http://R-Forge.R-project.org")
 library(maptools)
@@ -29,11 +32,14 @@ library(kableExtra)
 library(gt)
 
 
+
+
 dat <- readRDS("data/finalpanel.rds")
 
 ```
 
 ### Generate Alternate Models
+
 ```{r data, include=FALSE}
 #cult has more than 10 obs per year
 altpanel1 <- dat
@@ -115,6 +121,7 @@ rm(summarycult, summarycult2, summaryloc)
 ```
 
 ### Regressions
+
 ```{r data, include=FALSE}
 dat %>%
   group_by(year) %>%
@@ -131,7 +138,7 @@ dat <- merge(dat,summaryobs, by = c("year","provence", "bt","color"),all = TRUE,
 dat$count <- if_else(dat$count %in% c(NA), "0", "1")
 dat <- dat[!dat$count== "1", ]
 
-summaryobs <- dat %>% group_by(bt, year, provence, color) %>%
+summaryobs <- dat %>% group_by(technology, year, provence, color) %>%
   summarise(count = n())
 
 
@@ -145,6 +152,10 @@ dat <- bandconv
 
 
 summarynew <- dat %>% group_by(provence,color, technology, year, .add = FALSE) %>% 
+  summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+summaryyellow <- dat[!dat$color == "yellow",] %>% group_by(provence, technology, year, .add = FALSE) %>% 
   summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
 
@@ -165,16 +176,21 @@ max(dat$ysq_effect)
 
 # Provence by year by GM effects in one model
 
-## LEFT OFF HERE ** above
 reg3 <- glm(yield ~ GM + color+ year*provence*GM + provence*yearsq*GM + provence + factor(year)+ + irrigated,data = dat)
 summary(reg3)
 
 models <- list(reg1,reg2,reg3)
 
+extract_eq(reg1)
+extract_eq(reg2)
+extract_eq(reg3)
+
+
+
 
 modelregress <- msummary(models, vcov = vcovHC, stars = TRUE)
 print(modelregress)
-reduced <- c('(Intercept)' = 'Constant',
+#reduced <- c('(Intercept)' = 'Constant',
              'provenceFS' = "Free State",
              'provenceGP' = "GP",
              'provenceKZN' = "KZN",
@@ -291,8 +307,8 @@ summarywc <- WC %>% group_by(year, GM, color, .add = FALSE) %>%
 
 ```
 
-
 ###Alt Model Regressions
+
 ```{r data, include=FALSE}
 
 ##Alt Model 1
@@ -368,8 +384,8 @@ msummary(models, coef_map = reduced)
 
 ```
 
-
 ### yield gains peak
+
 ```{r data, include=FALSE}
 breakpoint <- data.frame(0,0,0)
 colnames(breakpoint) <- c('provence', 'ysq_effectmax')
