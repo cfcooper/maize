@@ -20,6 +20,9 @@ library(ggplot2)
 install.packages("gt")
 library(gt)
 
+install.packages("devtools")
+devtools::install_github("jaredhuling/jcolors")
+library(jcolors)
 
 # Read data and stack
 
@@ -267,6 +270,14 @@ write.csv(dat,"data/allyearsmerge.csv")
 ### Summary Statistics
 ```{r datasummary stats, include=false}
 #summ stats
+
+summarynew <- dat %>% 
+  group_by(color, technology, year, .add = FALSE) %>% 
+            summarise(mean = mean(yield, na.rm = T), 
+            SD = sd(yield, na.rm = T))
+
+p <- ggplot(summarynew, aes(year, mean))+ geom_smooth(aes(color=technology), size = 1, se=F) + theme_bw() + scale_color_jcolors(palette = "pal5")
+p
 
 bandconv <- dat[dat$technology %in% c("B", "conv"),]
 bandconv <- bandconv[!bandconv$provence == "LP",]

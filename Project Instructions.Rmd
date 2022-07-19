@@ -25,6 +25,9 @@ packages needed:
 
 ```{equations}
 library(equatiomatic)
+library(knitr)
+library(magrittr)
+library(rmarkdown)
 
 dat <- readRDS("data/finalpanel.rds")
 

@@ -335,7 +335,7 @@ totalloss <- allb %>% filter(technology == "B") %>%
 totalloss <- merge(allb, totalloss, by = c("year"), no.dups = TRUE)
 totalloss <- totalloss[,c("year", "ysq_effect", "mean", "SD")]
 totalloss <- totalloss[!duplicated(totalloss), ]
-totalloss$maxysq <- ifelse(totalloss$year<2011, NA, max(totalloss$ysq_effect))
+totalloss$maxysq <- ifelse(totalloss$year<2008, NA, max(totalloss$ysq_effect))
 totalloss$gain_loss <- totalloss$ysq_effect - totalloss$maxysq
 
 ggplot(data=totalloss)+
@@ -354,5 +354,5 @@ totalloss$dollarlossperht <- totalloss$yearlyloss/totalloss$Bthectare
 totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss", "dollarlossperht", "consumption")]
 
 totalloss$rationloss <- (totalloss$mtloss*1000)/totalloss$consumption
-write.csv(totalloss, "output/totalloss.csv")
+write.csv(totalloss, "output/whitetotalloss.csv")
 

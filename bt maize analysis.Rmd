@@ -782,3 +782,57 @@ ggsave("output/colgg2.jpg",plot=colgg2,device = "jpg")
 
 
 ```
+
+
+```{r anaylsis, include=FALSE}
+is.na(dat$release_year) <- dat$release_year==''
+cult <- dat %>%
+  group_by(cultivar_name, technology, color, release_year) %>%
+  summarise(min = min(year, na.rm=T))
+sumcult <- cult %>% group_by(cultivar_name, technology) %>% summarise(count = n())
+sumcult <- na.omit(sumcult)
+cult$yearstr = substr(cult$release_year,1,4)
+is.na(cult$yearstr) <- cult$yearstr==''
+cult$yearstr = as.integer(cult$yearstr)
+cult$yearstr <- if_else(is.na(cult$yearstr),cult$min,cult$yearstr)
+cult$release_year <- cult$yearstr
+cult$release_year = as.integer(cult$release_year)
+ordered <- cult %>% group_by(cultivar_name, technology, release_year)
+ordered <- ordered[!duplicated(ordered$cultivar_name), ]
+cult <- ordered[,c("cultivar_name","technology","color","release_year")]
+dat <- merge(dat, cult, by = c("cultivar_name","technology","color"))
+dat$release_year <- dat$release_year.y
+
+dat <- dat[,c("year", "provence", "locality","cultivar_name", 
+              "rep", "yield", "color", "technology","bt", 
+              "crop", "irrigated", "release_year")]
+
+release <- dat %>%
+  group_by(year, technology, color) %>%
+  summarise(mean = mean(release_year, na.rm=T))
+
+brelease <- dat[dat$technology == "B", ] %>%
+  group_by(year, technology, color) %>%
+  summarise(mean = mean(release_year, na.rm=T))
+brelease$age <- brelease$year-brelease$mean
+brelease$age <- round(brelease$age, digits = 0)
+
+
+crelease <- dat[dat$technology == "conv", ] %>%
+  group_by(year, technology, color) %>%
+  summarise(mean = mean(release_year, na.rm=T))
+crelease$age <- crelease$year-crelease$mean
+crelease$age <- round(crelease$age, digits = 0)
+
+release <- rbind(brelease,crelease)
+yrelease <- release[release$color == "yellow", ]
+wrelease <- release[release$color == "white", ]
+write.csv(release, "output/releaseyears.csv")
+
+yellowrelease <- ggplot(yrelease, aes(year, age))+ geom_line(aes(color=technology), size = 1.25) + theme_bw() + scale_color_jcolors(palette = "pal5")
+yellowrelease
+
+whiterelease <- ggplot(wrelease, aes(year, age))+ geom_line(aes(color=technology), size = 1.25) + theme_bw() + scale_color_jcolors(palette = "pal5")
+whiterelease
+
+```
