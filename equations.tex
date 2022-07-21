@@ -1,0 +1,325 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={equations},
+  pdfauthor={Courtney Cooper},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{equations}
+\author{Courtney Cooper}
+\date{2022-07-21}
+
+\begin{document}
+\maketitle
+
+\hypertarget{r-markdown}{%
+\subsection{R Markdown}\label{r-markdown}}
+
+This is an R Markdown document. Markdown is a simple formatting syntax
+for authoring HTML, PDF, and MS Word documents. For more details on
+using R Markdown see \url{http://rmarkdown.rstudio.com}.
+
+When you click the \textbf{Knit} button a document will be generated
+that includes both content as well as the output of any embedded R code
+chunks within the document. You can embed an R code chunk like this:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(cars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00
+\end{verbatim}
+
+\hypertarget{including-plots}{%
+\subsection{Including Plots}\label{including-plots}}
+
+You can also embed plots, for example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\StringTok{"data/finalpanel.rds"}\NormalTok{)}
+
+\NormalTok{dat }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(year) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(yield, }\AttributeTok{na.rm=}\NormalTok{T))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{a-tibble-36-x-2}{%
+\section{A tibble: 36 x 2}\label{a-tibble-36-x-2}}
+
+\begin{verbatim}
+year  mean
+\end{verbatim}
+
+1 1981 4.26 2 1982 4.38 3 1984 3.69 4 1985 5.23 5 1986 4.65 6 1987 4.39
+7 1988 5.68 8 1989 6.08 9 1990 6.38 10 1991 6.70 \# \ldots{} with 26
+more rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# require 5 obs per year per province}
+\NormalTok{summaryobs }\OtherTok{\textless{}{-}}\NormalTok{ dat }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{group\_by}\NormalTok{(year, provence, color, bt) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{()) }\CommentTok{\# check bt if in more than one observation per province/year}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `summarise()` has grouped output by 'year', 'provence', 'color'. You can
+## override using the `.groups` argument.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{summaryobs }\OtherTok{\textless{}{-}}\NormalTok{ summaryobs[summaryobs}\SpecialCharTok{$}\NormalTok{count }\SpecialCharTok{\textless{}} \DecValTok{5}\NormalTok{,]}
+\NormalTok{summaryobs}\SpecialCharTok{$}\NormalTok{count }\OtherTok{\textless{}{-}} \StringTok{"1"}
+\NormalTok{dat }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(dat,summaryobs, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"year"}\NormalTok{,}\StringTok{"provence"}\NormalTok{, }\StringTok{"bt"}\NormalTok{,}\StringTok{"color"}\NormalTok{),}\AttributeTok{all =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{no.dups=} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{dat}\SpecialCharTok{$}\NormalTok{count }\OtherTok{\textless{}{-}} \FunctionTok{if\_else}\NormalTok{(dat}\SpecialCharTok{$}\NormalTok{count }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\ConstantTok{NA}\NormalTok{), }\StringTok{"0"}\NormalTok{, }\StringTok{"1"}\NormalTok{)}
+\NormalTok{dat }\OtherTok{\textless{}{-}}\NormalTok{ dat[}\SpecialCharTok{!}\NormalTok{dat}\SpecialCharTok{$}\NormalTok{count}\SpecialCharTok{==} \StringTok{"1"}\NormalTok{, ]}
+
+\NormalTok{summaryobs }\OtherTok{\textless{}{-}}\NormalTok{ dat }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{group\_by}\NormalTok{(technology, year, provence, color) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `summarise()` has grouped output by 'technology', 'year', 'provence'. You can
+## override using the `.groups` argument.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat}\SpecialCharTok{$}\NormalTok{GM }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{dat}\SpecialCharTok{$}\NormalTok{GM }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(dat}\SpecialCharTok{$}\NormalTok{technology }\SpecialCharTok{!=} \StringTok{"conv"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+
+\NormalTok{bandconv }\OtherTok{\textless{}{-}}\NormalTok{ dat[dat}\SpecialCharTok{$}\NormalTok{technology }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"B"}\NormalTok{, }\StringTok{"conv"}\NormalTok{),]}
+\NormalTok{bandconv }\OtherTok{\textless{}{-}}\NormalTok{ bandconv[}\SpecialCharTok{!}\NormalTok{bandconv}\SpecialCharTok{$}\NormalTok{provence }\SpecialCharTok{==} \StringTok{"LP"}\NormalTok{,]}
+
+\NormalTok{dat }\OtherTok{\textless{}{-}}\NormalTok{ bandconv}
+
+
+\NormalTok{summarynew }\OtherTok{\textless{}{-}}\NormalTok{ dat }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{group\_by}\NormalTok{(provence,color, technology, year, }\AttributeTok{.add =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(yield, }\AttributeTok{na.rm =}\NormalTok{ T), }
+            \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(yield, }\AttributeTok{na.rm =}\NormalTok{ T))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `summarise()` has grouped output by 'provence', 'color', 'technology'. You can
+## override using the `.groups` argument.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{summaryyellow }\OtherTok{\textless{}{-}}\NormalTok{ dat[}\SpecialCharTok{!}\NormalTok{dat}\SpecialCharTok{$}\NormalTok{color }\SpecialCharTok{==} \StringTok{"yellow"}\NormalTok{,] }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{group\_by}\NormalTok{(provence, technology, year, }\AttributeTok{.add =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(yield, }\AttributeTok{na.rm =}\NormalTok{ T), }
+            \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(yield, }\AttributeTok{na.rm =}\NormalTok{ T))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `summarise()` has grouped output by 'provence', 'technology'. You can override
+## using the `.groups` argument.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg1 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GM }\SpecialCharTok{+}\NormalTok{ color }\SpecialCharTok{+}\NormalTok{ provence }\SpecialCharTok{+} \FunctionTok{factor}\NormalTok{(year) }\SpecialCharTok{+}\NormalTok{ irrigated,}\AttributeTok{data =}\NormalTok{ dat)}
+
+
+\NormalTok{dat}\SpecialCharTok{$}\NormalTok{yearsq }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{year}\SpecialCharTok{*}\NormalTok{dat}\SpecialCharTok{$}\NormalTok{year}
+
+\NormalTok{reg2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GM }\SpecialCharTok{+}\NormalTok{ color }\SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{*}\NormalTok{GM }\SpecialCharTok{+}\NormalTok{ yearsq}\SpecialCharTok{*}\NormalTok{GM }\SpecialCharTok{+}\NormalTok{ provence }\SpecialCharTok{+} \FunctionTok{factor}\NormalTok{(year)}\SpecialCharTok{+}\NormalTok{ irrigated,}\AttributeTok{data =}\NormalTok{ dat)}
+
+
+
+\NormalTok{dat}\SpecialCharTok{$}\NormalTok{y\_effect }\OtherTok{\textless{}{-}}\NormalTok{ reg2}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"GM"}\NormalTok{] }\SpecialCharTok{+}\NormalTok{ reg2}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"GM:year"}\NormalTok{] }\SpecialCharTok{*}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{year}
+\NormalTok{dat}\SpecialCharTok{$}\NormalTok{ysq\_effect }\OtherTok{\textless{}{-}}\NormalTok{ reg2}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"GM"}\NormalTok{] }\SpecialCharTok{+}\NormalTok{ reg2}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"GM:year"}\NormalTok{] }\SpecialCharTok{*}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{year }\SpecialCharTok{+}\NormalTok{ reg2}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"GM:yearsq"}\NormalTok{] }\SpecialCharTok{*}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{yearsq}
+
+
+\CommentTok{\# Provence by year by GM effects in one model}
+
+\NormalTok{reg3 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GM }\SpecialCharTok{+}\NormalTok{ color}\SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{*}\NormalTok{provence}\SpecialCharTok{*}\NormalTok{GM }\SpecialCharTok{+}\NormalTok{ provence}\SpecialCharTok{*}\NormalTok{yearsq}\SpecialCharTok{*}\NormalTok{GM }\SpecialCharTok{+}\NormalTok{ provence }\SpecialCharTok{+} \FunctionTok{factor}\NormalTok{(year)}\SpecialCharTok{+}\NormalTok{ irrigated,}\AttributeTok{data =}\NormalTok{ dat)}
+
+
+\NormalTok{models }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(reg1,reg2,reg3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{extract\_eq}\NormalTok{(reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{equation}
+E( \operatorname{yield} ) = \alpha + \beta_{1}(\operatorname{GM}) + \beta_{2}(\operatorname{color}_{\operatorname{yellow}}) + \beta_{3}(\operatorname{provence}_{\operatorname{FS}}) + \beta_{4}(\operatorname{provence}_{\operatorname{GP}}) + \beta_{5}(\operatorname{provence}_{\operatorname{KZN}}) + \beta_{6}(\operatorname{provence}_{\operatorname{MP}}) + \beta_{7}(\operatorname{provence}_{\operatorname{NC}}) + \beta_{8}(\operatorname{provence}_{\operatorname{NW}}) + \beta_{9}(\operatorname{provence}_{\operatorname{WC}}) + \beta_{10}(\operatorname{factor(year)}_{\operatorname{1982}}) + \beta_{11}(\operatorname{factor(year)}_{\operatorname{1984}}) + \beta_{12}(\operatorname{factor(year)}_{\operatorname{1985}}) + \beta_{13}(\operatorname{factor(year)}_{\operatorname{1986}}) + \beta_{14}(\operatorname{factor(year)}_{\operatorname{1987}}) + \beta_{15}(\operatorname{factor(year)}_{\operatorname{1988}}) + \beta_{16}(\operatorname{factor(year)}_{\operatorname{1989}}) + \beta_{17}(\operatorname{factor(year)}_{\operatorname{1990}}) + \beta_{18}(\operatorname{factor(year)}_{\operatorname{1991}}) + \beta_{19}(\operatorname{factor(year)}_{\operatorname{1993}}) + \beta_{20}(\operatorname{factor(year)}_{\operatorname{1994}}) + \beta_{21}(\operatorname{factor(year)}_{\operatorname{1995}}) + \beta_{22}(\operatorname{factor(year)}_{\operatorname{1996}}) + \beta_{23}(\operatorname{factor(year)}_{\operatorname{1997}}) + \beta_{24}(\operatorname{factor(year)}_{\operatorname{1998}}) + \beta_{25}(\operatorname{factor(year)}_{\operatorname{1999}}) + \beta_{26}(\operatorname{factor(year)}_{\operatorname{2000}}) + \beta_{27}(\operatorname{factor(year)}_{\operatorname{2001}}) + \beta_{28}(\operatorname{factor(year)}_{\operatorname{2002}}) + \beta_{29}(\operatorname{factor(year)}_{\operatorname{2003}}) + \beta_{30}(\operatorname{factor(year)}_{\operatorname{2004}}) + \beta_{31}(\operatorname{factor(year)}_{\operatorname{2005}}) + \beta_{32}(\operatorname{factor(year)}_{\operatorname{2006}}) + \beta_{33}(\operatorname{factor(year)}_{\operatorname{2007}}) + \beta_{34}(\operatorname{factor(year)}_{\operatorname{2008}}) + \beta_{35}(\operatorname{factor(year)}_{\operatorname{2009}}) + \beta_{36}(\operatorname{factor(year)}_{\operatorname{2010}}) + \beta_{37}(\operatorname{factor(year)}_{\operatorname{2011}}) + \beta_{38}(\operatorname{factor(year)}_{\operatorname{2012}}) + \beta_{39}(\operatorname{factor(year)}_{\operatorname{2013}}) + \beta_{40}(\operatorname{factor(year)}_{\operatorname{2014}}) + \beta_{41}(\operatorname{factor(year)}_{\operatorname{2016}}) + \beta_{42}(\operatorname{factor(year)}_{\operatorname{2017}}) + \beta_{43}(\operatorname{factor(year)}_{\operatorname{2018}}) + \beta_{44}(\operatorname{factor(year)}_{\operatorname{2019}}) + \beta_{45}(\operatorname{irrigated})
+\end{equation}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{extract\_eq}\NormalTok{(reg2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+\end{verbatim}
+
+\begin{equation}
+E( \operatorname{yield} ) = \alpha + \beta_{1}(\operatorname{GM}) + \beta_{2}(\operatorname{color}_{\operatorname{yellow}}) + \beta_{3}(\operatorname{year}) + \beta_{4}(\operatorname{yearsq}) + \beta_{5}(\operatorname{provence}_{\operatorname{FS}}) + \beta_{6}(\operatorname{provence}_{\operatorname{GP}}) + \beta_{7}(\operatorname{provence}_{\operatorname{KZN}}) + \beta_{8}(\operatorname{provence}_{\operatorname{MP}}) + \beta_{9}(\operatorname{provence}_{\operatorname{NC}}) + \beta_{10}(\operatorname{provence}_{\operatorname{NW}}) + \beta_{11}(\operatorname{provence}_{\operatorname{WC}}) + \beta_{12}(\operatorname{factor(year)}_{\operatorname{1982}}) + \beta_{13}(\operatorname{factor(year)}_{\operatorname{1984}}) + \beta_{14}(\operatorname{factor(year)}_{\operatorname{1985}}) + \beta_{15}(\operatorname{factor(year)}_{\operatorname{1986}}) + \beta_{16}(\operatorname{factor(year)}_{\operatorname{1987}}) + \beta_{17}(\operatorname{factor(year)}_{\operatorname{1988}}) + \beta_{18}(\operatorname{factor(year)}_{\operatorname{1989}}) + \beta_{19}(\operatorname{factor(year)}_{\operatorname{1990}}) + \beta_{20}(\operatorname{factor(year)}_{\operatorname{1991}}) + \beta_{21}(\operatorname{factor(year)}_{\operatorname{1993}}) + \beta_{22}(\operatorname{factor(year)}_{\operatorname{1994}}) + \beta_{23}(\operatorname{factor(year)}_{\operatorname{1995}}) + \beta_{24}(\operatorname{factor(year)}_{\operatorname{1996}}) + \beta_{25}(\operatorname{factor(year)}_{\operatorname{1997}}) + \beta_{26}(\operatorname{factor(year)}_{\operatorname{1998}}) + \beta_{27}(\operatorname{factor(year)}_{\operatorname{1999}}) + \beta_{28}(\operatorname{factor(year)}_{\operatorname{2000}}) + \beta_{29}(\operatorname{factor(year)}_{\operatorname{2001}}) + \beta_{30}(\operatorname{factor(year)}_{\operatorname{2002}}) + \beta_{31}(\operatorname{factor(year)}_{\operatorname{2003}}) + \beta_{32}(\operatorname{factor(year)}_{\operatorname{2004}}) + \beta_{33}(\operatorname{factor(year)}_{\operatorname{2005}}) + \beta_{34}(\operatorname{factor(year)}_{\operatorname{2006}}) + \beta_{35}(\operatorname{factor(year)}_{\operatorname{2007}}) + \beta_{36}(\operatorname{factor(year)}_{\operatorname{2008}}) + \beta_{37}(\operatorname{factor(year)}_{\operatorname{2009}}) + \beta_{38}(\operatorname{factor(year)}_{\operatorname{2010}}) + \beta_{39}(\operatorname{factor(year)}_{\operatorname{2011}}) + \beta_{40}(\operatorname{factor(year)}_{\operatorname{2012}}) + \beta_{41}(\operatorname{factor(year)}_{\operatorname{2013}}) + \beta_{42}(\operatorname{factor(year)}_{\operatorname{2014}}) + \beta_{43}(\operatorname{factor(year)}_{\operatorname{2016}}) + \beta_{44}(\operatorname{factor(year)}_{\operatorname{2017}}) + \beta_{45}(\operatorname{factor(year)}_{\operatorname{2018}}) + \beta_{46}(\operatorname{factor(year)}_{\operatorname{2019}}) + \beta_{47}(\operatorname{irrigated}) + \beta_{48}(\operatorname{GM} \times \operatorname{year}) + \beta_{49}(\operatorname{GM} \times \operatorname{year}_{\operatorname{sq}} \times \operatorname{yearsq}_{\operatorname{GM}})
+\end{equation}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{extract\_eq}\NormalTok{(reg3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+
+## Warning in mapply(...): longer argument not a multiple of length of shorter
+\end{verbatim}
+
+\begin{equation}
+E( \operatorname{yield} ) = \alpha + \beta_{1}(\operatorname{GM}) + \beta_{2}(\operatorname{color}_{\operatorname{yellow}}) + \beta_{3}(\operatorname{year}) + \beta_{4}(\operatorname{provence}_{\operatorname{FS}}) + \beta_{5}(\operatorname{provence}_{\operatorname{GP}}) + \beta_{6}(\operatorname{provence}_{\operatorname{KZN}}) + \beta_{7}(\operatorname{provence}_{\operatorname{MP}}) + \beta_{8}(\operatorname{provence}_{\operatorname{NC}}) + \beta_{9}(\operatorname{provence}_{\operatorname{NW}}) + \beta_{10}(\operatorname{provence}_{\operatorname{WC}}) + \beta_{11}(\operatorname{yearsq}) + \beta_{12}(\operatorname{factor(year)}_{\operatorname{1982}}) + \beta_{13}(\operatorname{factor(year)}_{\operatorname{1984}}) + \beta_{14}(\operatorname{factor(year)}_{\operatorname{1985}}) + \beta_{15}(\operatorname{factor(year)}_{\operatorname{1986}}) + \beta_{16}(\operatorname{factor(year)}_{\operatorname{1987}}) + \beta_{17}(\operatorname{factor(year)}_{\operatorname{1988}}) + \beta_{18}(\operatorname{factor(year)}_{\operatorname{1989}}) + \beta_{19}(\operatorname{factor(year)}_{\operatorname{1990}}) + \beta_{20}(\operatorname{factor(year)}_{\operatorname{1991}}) + \beta_{21}(\operatorname{factor(year)}_{\operatorname{1993}}) + \beta_{22}(\operatorname{factor(year)}_{\operatorname{1994}}) + \beta_{23}(\operatorname{factor(year)}_{\operatorname{1995}}) + \beta_{24}(\operatorname{factor(year)}_{\operatorname{1996}}) + \beta_{25}(\operatorname{factor(year)}_{\operatorname{1997}}) + \beta_{26}(\operatorname{factor(year)}_{\operatorname{1998}}) + \beta_{27}(\operatorname{factor(year)}_{\operatorname{1999}}) + \beta_{28}(\operatorname{factor(year)}_{\operatorname{2000}}) + \beta_{29}(\operatorname{factor(year)}_{\operatorname{2001}}) + \beta_{30}(\operatorname{factor(year)}_{\operatorname{2002}}) + \beta_{31}(\operatorname{factor(year)}_{\operatorname{2003}}) + \beta_{32}(\operatorname{factor(year)}_{\operatorname{2004}}) + \beta_{33}(\operatorname{factor(year)}_{\operatorname{2005}}) + \beta_{34}(\operatorname{factor(year)}_{\operatorname{2006}}) + \beta_{35}(\operatorname{factor(year)}_{\operatorname{2007}}) + \beta_{36}(\operatorname{factor(year)}_{\operatorname{2008}}) + \beta_{37}(\operatorname{factor(year)}_{\operatorname{2009}}) + \beta_{38}(\operatorname{factor(year)}_{\operatorname{2010}}) + \beta_{39}(\operatorname{factor(year)}_{\operatorname{2011}}) + \beta_{40}(\operatorname{factor(year)}_{\operatorname{2012}}) + \beta_{41}(\operatorname{factor(year)}_{\operatorname{2013}}) + \beta_{42}(\operatorname{factor(year)}_{\operatorname{2014}}) + \beta_{43}(\operatorname{factor(year)}_{\operatorname{2016}}) + \beta_{44}(\operatorname{factor(year)}_{\operatorname{2017}}) + \beta_{45}(\operatorname{factor(year)}_{\operatorname{2018}}) + \beta_{46}(\operatorname{factor(year)}_{\operatorname{2019}}) + \beta_{47}(\operatorname{irrigated}) + \beta_{48}(\operatorname{year} \times \operatorname{provence}_{\operatorname{FS}}) + \beta_{49}(\operatorname{year} \times \operatorname{provence}_{\operatorname{GP}}) + \beta_{50}(\operatorname{year} \times \operatorname{provence}_{\operatorname{KZN}}) + \beta_{51}(\operatorname{year} \times \operatorname{provence}_{\operatorname{MP}}) + \beta_{52}(\operatorname{year} \times \operatorname{provence}_{\operatorname{NC}}) + \beta_{53}(\operatorname{year} \times \operatorname{provence}_{\operatorname{NW}}) + \beta_{54}(\operatorname{year} \times \operatorname{provence}_{\operatorname{WC}}) + \beta_{55}(\operatorname{GM} \times \operatorname{year}) + \beta_{56}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{FS}}) + \beta_{57}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{GP}}) + \beta_{58}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{KZN}}) + \beta_{59}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{MP}}) + \beta_{60}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{NC}}) + \beta_{61}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{NW}}) + \beta_{62}(\operatorname{GM} \times \operatorname{provence}_{\operatorname{WC}}) + \beta_{63}(\operatorname{year}_{\operatorname{provenceFS}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceFS}}) + \beta_{64}(\operatorname{year}_{\operatorname{provenceGP}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceGP}}) + \beta_{65}(\operatorname{year}_{\operatorname{provenceKZN}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceKZN}}) + \beta_{66}(\operatorname{year}_{\operatorname{provenceMP}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceMP}}) + \beta_{67}(\operatorname{year}_{\operatorname{provenceNC}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceNC}}) + \beta_{68}(\operatorname{year}_{\operatorname{provenceNW}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceNW}}) + \beta_{69}(\operatorname{year}_{\operatorname{provenceWC}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{provenceWC}}) + \beta_{70}(\operatorname{GM} \times \operatorname{year}_{\operatorname{sq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{71}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{FS}}) + \beta_{72}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{GP}}) + \beta_{73}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{KZN}}) + \beta_{74}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{MP}}) + \beta_{75}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{NC}}) + \beta_{76}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{NW}}) + \beta_{77}(\operatorname{GM} \times \operatorname{year} \times \operatorname{provence}_{\operatorname{WC}}) + \beta_{78}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceFS}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{79}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceGP}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{80}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceKZN}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{81}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceMP}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{82}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceNC}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{83}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceNW}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}}) + \beta_{84}(\operatorname{GM} \times \operatorname{year}_{\operatorname{provenceWC}} \times \operatorname{provence}_{\operatorname{yearsq}} \times \operatorname{yearsq}_{\operatorname{GM}})
+\end{equation}
+
+Note that the \texttt{echo\ =\ FALSE} parameter was added to the code
+chunk to prevent printing of the R code that generated the plot.
+
+\end{document}
