@@ -275,9 +275,11 @@ summarynew <- dat %>%
   group_by(color, technology, year, .add = FALSE) %>% 
             summarise(mean = mean(yield, na.rm = T), 
             SD = sd(yield, na.rm = T))
+##FIGURE 2
 
 p <- ggplot(summarynew, aes(year, mean))+ geom_smooth(aes(color=technology), size = 1, se=F) + theme_bw() + scale_color_jcolors(palette = "pal5")
 p
+
 
 bandconv <- dat[dat$technology %in% c("B", "conv"),]
 bandconv <- bandconv[!bandconv$provence == "LP",]
@@ -319,6 +321,7 @@ ybtsummarystat <- merge(ybtsummarystat, btsummarystat4, by = c("provence","techn
 ybtsummarystat <- merge(ybtsummarystat, btlocal, by = c("provence","technology"))
 names(ybtsummarystat)[names(ybtsummarystat) == "n"] <- "num_of_localities"
 
+##TABLE 1
 
 ybtsummarystat <- ybtsummarystat %>%
             gt(rowname_col = "province") %>%
@@ -377,6 +380,7 @@ wbtsummarystat <- merge(wbtsummarystat, btsummarystat4, by = c("provence","techn
 wbtsummarystat <- merge(wbtsummarystat, btlocal, by = c("provence","technology"))
 names(wbtsummarystat)[names(wbtsummarystat) == "n"] <- "num_of_localities"
 
+##TABLE 2
 
 wbtsummarystat <- wbtsummarystat %>%
             gt(rowname_col = "province") %>%
@@ -395,6 +399,7 @@ wbtsummarystat <- wbtsummarystat %>%
   cols_align(
     align = "center",
     columns = everything())
+
   
 write.csv(wbtsummarystat,"wbtsummarystat.csv")
 

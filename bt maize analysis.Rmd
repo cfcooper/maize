@@ -422,6 +422,7 @@ breakpoint2 <- breakpoint2[!duplicated(breakpoint2), ]
 
 write.csv(breakpoint2, "output/breakpoint.csv")
 
+## FIGURE 6
 ggbreak <- ggplot(prov3,aes(year,ysq_effect))+
   geom_smooth(aes(color=provence), size = 1) +
   theme_bw() + coord_cartesian(xlim= c(1999,2020), ylim = c(-.05,.6), clip = "on")
@@ -460,6 +461,7 @@ summtbl2 <- prov %>% filter(technology == "B") %>%
 write.csv(summtbl2, "output/btobs.csv")
 
 ##finding lost gains BY PROV
+##TABLE 4/5
 maizeprod <- read.csv("data/metadata/maizeproduction.csv")
 
 names(maizeprod)[2:7] <- c("percentBt","percentwhite", "percentyellow", "whiteprice", "yellowprice", "totalmaizeht")
@@ -602,6 +604,7 @@ totalloss$totalmaizevalue <- totalloss$totalmt*totalloss$totalprice
 totalloss <- totalloss[,c("year", "ysq_effect","maxysq","gain_loss", "mtloss", "yearlyloss","consumption","rationloss", "dollarlossperht","totalmaizevalue")]
 
 # Cleaned Total Loss
+## TABLE 3
 write.csv(totalloss, "output/totalloss.csv")
 
 totalloss <- totalloss[totalloss$year > 2006,]
@@ -639,8 +642,7 @@ summaryec <- bonly %>% filter(provence == "EC") %>%
   group_by(color, year, provence, .add = FALSE) %>%
   summarise(count = n())
 
-### predict economic loss
-
+##FIGURE 1
 
 ### map provinces
 install.packages("raster")
@@ -737,6 +739,7 @@ post$bt <- if_else(post$bt == 1, "bt", "conv", missing=NULL)
 btgg <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
   geom_boxplot(aes(color=bt), size = .75)
 
+##FIGURE 4
 btgg2 <- btgg +
   theme_bw() +
   labs(
@@ -750,6 +753,7 @@ btgg2 <- btgg +
 print(btgg2)
 ggsave("output/btgg2.jpg",plot=btgg2,device = "jpg")
 
+##FIGURE 5
 provboxplot <- ggplot(post, aes(year, yield, group= interaction(bt, year))) + 
   geom_boxplot(aes(color=bt), size = .5, outlier.shape = NA) +
   theme_bw() +
